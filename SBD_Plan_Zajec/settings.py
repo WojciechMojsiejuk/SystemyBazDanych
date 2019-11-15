@@ -77,12 +77,12 @@ WSGI_APPLICATION = 'SBD_Plan_Zajec.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.mysql',
-        'NAME': 'sys',
-        'USER': 'root',
-        'PASSWORD': 'RNA3{dudes',
-        'HOST': 'localhost',
-        'PORT': '3306',
+        'ENGINE': 'django.db.backends.sqlite3',
+        'NAME': 'syslite',
+        #'USER': 'root',
+        #'PASSWORD': 'RNA3{dudes',
+        #'HOST': 'localhost',
+        #'PORT': '3306',
     }
 }
 

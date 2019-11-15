@@ -50,9 +50,14 @@ class Osoby(models.Model):
 class Studenci(Osoby):
     nr_albumu = models.AutoField(primary_key=True)
 
+    USERNAME_FIELD = 'nr_albumu'
+    #REQUIRED_FIELDS = []
+
 
 class Nauczyciele(Osoby):
     id_nauczyciela = models.AutoField(primary_key=True)
+
+    USERNAME_FIELD = 'id_nauczyciela'
 
 
 class Sale(models.Model):
@@ -172,4 +177,3 @@ class StudentKierunekSemestr(models.Model):
     id_semestru = models.ForeignKey(Semestry, on_delete=models.CASCADE)
     data_rozpoczecia = models.DateField()
     data_zakonczenia = models.DateField()
-
