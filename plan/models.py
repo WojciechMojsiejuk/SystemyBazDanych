@@ -1,5 +1,6 @@
 from django.core.validators import MaxValueValidator, MinValueValidator
 from django.db import models
+from django.contrib.auth.models import User
 
 # Create your models here.
 
@@ -32,6 +33,7 @@ class Semestry(models.Model):
 
 
 class Osoby(models.Model):
+    user = models.OneToOneField(User, on_delete=models.CASCADE)
     pesel = models.IntegerField(validators=[
                                     MaxValueValidator(99999999999),
                                     MinValueValidator(10000000000)
