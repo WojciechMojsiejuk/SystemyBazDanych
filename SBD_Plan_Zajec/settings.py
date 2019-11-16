@@ -39,7 +39,11 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'plan',
     'autofixture',
+    'localflavor',
+    'crispy_forms',
 ]
+
+CRISPY_TEMPLATE_PACK = 'bootstrap4'
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
@@ -72,21 +76,23 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'SBD_Plan_Zajec.wsgi.application'
 
-
+LOGIN_REDIRECT_URL = "/home"
 # Database
 # https://docs.djangoproject.com/en/2.2/ref/settings/#databases
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': 'syslite',
-        #'USER': 'root',
-        #'PASSWORD': 'RNA3{dudes',
-        #'HOST': 'localhost',
-        #'PORT': '3306',
+        'ENGINE': 'django.db.backends.mysql',
+        'NAME': 'degra',
+        'USER': 'root',
+        'PASSWORD': 'RNA3{dudes',
+        'HOST': 'localhost',
+        'PORT': '3306',
     }
 }
 
+# Custom user model
+AUTH_USER_MODEL = 'plan.User'
 
 # Password validation
 # https://docs.djangoproject.com/en/2.2/ref/settings/#auth-password-validators

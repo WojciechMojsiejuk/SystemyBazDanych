@@ -1,8 +1,9 @@
-from django.core.validators import MaxValueValidator, MinValueValidator
+from django.core.validators import MaxValueValidator, MinValueValidator, RegexValidator
 from django.db import models
-from django.contrib.auth.models import User
-
+from django.contrib.auth.models import AbstractUser
 # Create your models here.
+from django.db.models.signals import post_save
+from django.dispatch import receiver
 
 
 class Uczelnie(models.Model):
@@ -32,34 +33,31 @@ class Semestry(models.Model):
     )
 
 
+class User(AbstractUser):
+    is_student = models.BooleanField(default=False)
+    is_teacher = models.BooleanField(default=False)
+
+    class Meta:
+        db_table = 'plan_user'
+
+
 class Osoby(models.Model):
-    user = models.OneToOneField(User, on_delete=models.CASCADE)
-    pesel = models.IntegerField(validators=[
-                                    MaxValueValidator(99999999999),
-                                    MinValueValidator(10000000000)
-                                ],
-                                unique=True
-                                )
+    user = models.OneToOneField(User, on_delete=models.CASCADE, primary_key=True)
+    pesel_validator = RegexValidator(r'^\d{11}')
+    pesel = models.CharField(unique=True, max_length=11, validators=[pesel_validator])
     imie = models.CharField(max_length=100)
     nazwisko = models.CharField(max_length=100)
-    haslo = models.CharField(max_length=50)
-    czy_aktywny = models.BooleanField(default=True)
 
     class Meta:
         abstract = True
 
 
 class Studenci(Osoby):
-    nr_albumu = models.AutoField(primary_key=True)
-
-    USERNAME_FIELD = 'nr_albumu'
-    #REQUIRED_FIELDS = []
+    pass
 
 
 class Nauczyciele(Osoby):
-    id_nauczyciela = models.AutoField(primary_key=True)
-
-    USERNAME_FIELD = 'id_nauczyciela'
+    pass
 
 
 class Sale(models.Model):

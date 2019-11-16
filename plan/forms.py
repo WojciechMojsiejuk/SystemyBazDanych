@@ -1,32 +1,51 @@
 from django import forms
-from django.contrib.auth.forms import UserCreationForm, AuthenticationForm, UserChangeForm
-from django.contrib.auth.models import User
+from django.contrib.auth.forms import UserCreationForm
+from django.db import transaction
+from plan.models import Studenci, User, Nauczyciele
 
-from .models import Studenci, Nauczyciele
+
+class StudentSignUpForm(UserCreationForm):
+
+    imie = forms.CharField(max_length=100, required=True)
+    nazwisko = forms.CharField(max_length=100, required=True)
+    pesel = forms.CharField(max_length=11, required=True, help_text="PESEL number consists of 11 digits")
+
+    class Meta(UserCreationForm.Meta):
+        model = User
+
+    @transaction.atomic
+    def save(self):
+        user = super().save(commit=False)
+        user.is_student = True
+        user.save()
+        student = Studenci.objects.create(
+            user=user,
+            imie=self.cleaned_data.get('imie'),
+            nazwisko=self.cleaned_data.get('nazwisko'),
+            pesel=self.cleaned_data.get('pesel')
+        )
+        return user
 
 
-class SignUpFormStudent(UserCreationForm):
-    login = False
+class TeacherSignUpForm(UserCreationForm):
 
-    class Meta:
-        model = Studenci
-        fields = ('pesel', 'imie', 'nazwisko' ,'password1', 'password2')
-        labels = {
-            'pesel' : 'Numer PESEL',
-        }
+    imie = forms.CharField(max_length=100, required=True)
+    nazwisko = forms.CharField(max_length=100, required=True)
+    pesel = forms.CharField(max_length=11, required=True, help_text="PESEL number consists of 11 digits")
 
-    # def __init__(self, *args, **kwargs):
-    #     super(SignUpForm, self).__init__(*args, **kwargs)
-    #     self.fields['pesel'].help_text = 'Podaj PESEL'
-    #     self.fields['nr_albumu'].help_text = 'Podaj numer albumu? XD'
-    #     self.fields['haslo'].help_text = 'Podaj hasło'
+    class Meta(UserCreationForm.Meta):
+        model = User
 
-class SignUpFormTeacher(UserCreationForm):
-    login = False
+    @transaction.atomic
+    def save(self):
+        user = super().save(commit=False)
+        user.is_teacher = True
+        user.save()
+        teacher = Nauczyciele.objects.create(
+            user=user,
+            imie=self.cleaned_data.get('imie'),
+            nazwisko=self.cleaned_data.get('nazwisko'),
+            pesel=self.cleaned_data.get('pesel')
 
-    class Meta:
-        model = Nauczyciele
-        fields = ('pesel', 'imie', 'nazwisko' ,'password1', 'password2')
-        labels = {
-            'pesel' : 'Numer PESEL',
-        }
+        )
+        return user
