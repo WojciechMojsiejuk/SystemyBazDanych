@@ -1,9 +1,10 @@
+import datetime
+
 from django.core.validators import MaxValueValidator, MinValueValidator, RegexValidator
 from django.db import models
 from django.contrib.auth.models import AbstractUser
+
 # Create your models here.
-from django.db.models.signals import post_save
-from django.dispatch import receiver
 
 
 class Uczelnie(models.Model):
@@ -24,6 +25,7 @@ class Kierunki(models.Model):
 
 
 class Semestry(models.Model):
+    id_kierunku = models.ForeignKey(Kierunki, on_delete=models.CASCADE)
     id_semestru = models.AutoField(primary_key=True)
     nr_semestru = models.IntegerField(
         validators=[
@@ -172,8 +174,12 @@ class PlanyZajecNauczycieli(PlanyZajecUzytkownikow):
 
 
 class StudentKierunekSemestr(models.Model):
-    nr_albumu = models.ForeignKey(Studenci, on_delete=models.CASCADE)
+    id_studenta = models.ForeignKey(Studenci, on_delete=models.CASCADE)
     id_kierunku = models.ForeignKey(Kierunki, on_delete=models.CASCADE)
     id_semestru = models.ForeignKey(Semestry, on_delete=models.CASCADE)
     data_rozpoczecia = models.DateField()
     data_zakonczenia = models.DateField()
+
+    def is_current(self):
+        now = datetime.date.today()
+        return self.data_rozpoczecia.date() <= now <= self.data_zakonczenia.date()

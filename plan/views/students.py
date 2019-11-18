@@ -1,9 +1,11 @@
 from django.contrib.auth import login
+from django.contrib.auth.decorators import login_required
 from django.shortcuts import redirect
-from django.views.generic import CreateView
+from django.views.generic import CreateView, ListView
 
-from ..forms import StudentSignUpForm
-from ..models import User
+from ..forms import StudentSignUpForm, StudentEnrollInSemesterForm
+from ..models import User, Uczelnie, StudentKierunekSemestr, Studenci
+from django.utils.decorators import method_decorator
 
 
 class StudentSignUpView(CreateView):
@@ -19,3 +21,22 @@ class StudentSignUpView(CreateView):
         user = form.save()
         login(self.request, user)
         return redirect('signup')
+
+
+class StudentEnrolledSemestersListView(ListView):
+
+    template_name = 'students/universities_list.html'
+    context_object_name = 'enrolled_semesters'
+
+    @method_decorator(login_required)
+    def dispatch(self, *args, **kwargs):
+        return super(StudentEnrolledSemestersListView, self).dispatch(*args, **kwargs)
+
+    def get_queryset(self):
+        selected_user = Studenci.objects.all().get(user=self.request.user)
+        return StudentKierunekSemestr(id_studenta=selected_user)
+
+
+class StudentEnrollInSemesterView(CreateView):
+    model = StudentKierunekSemestr
+    form_class = StudentEnrollInSemesterForm

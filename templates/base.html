@@ -17,27 +17,46 @@
   <body>
     <div class="container my-4">
       <div class="row justify-content-center">
-        <div class="col-md-10 col-sm-12">
+        <div class="col-md-14 col-sm-12">
           <div class="row">
-            <div class="col-6">
-              <h1 class="logo">
-{#                  {% if user.is_authenticated %}#}
-{#                    {% if user.is_teacher %}#}
-{#                      <span class="icon-feather" data-toggle="tooltip" data-placement="right" title="Teacher profile"></span>#}
-{#                    {% else %}#}
-{#                      <span class="icon-graduation-cap" data-toggle="tooltip" data-placement="right" title="Student profile"></span>#}
-{#                    {% endif %}#}
-{#                  {% endif %}#}
-                </a>
-              </h1>
+            <div class="col-9">
+
+                  <nav class="navbar navbar-expand-md bg-light">
+
+                  <!-- Links -->
+                  <ul class="navbar-nav">
+                    <li class="nav-item">
+                      <a class="nav-link" href="{% url 'home' %}">Homepage</a>
+                    </li>
+
+                      {% if user.is_authenticated %}
+                        <li class="nav-item">
+                          <a class="nav-link" href=" {% url 'students:universities_list' %}">User's plan</a>
+                        </li>
+                        <li class="nav-item">
+                          <a class="nav-link" href="#">Rooms' availability</a>
+                        </li>
+                       <li class="nav-item">
+                          <a class="nav-link" href="#">Teachers' plans</a>
+                        </li>
+                      <li class="nav-item">
+                          <a class="nav-link" href="#">Others' plans</a>
+                        </li>
+                          <li class="nav-item">
+                          <a class="nav-link" href="#">Rooms reservation</a>
+                        </li>
+                      {% endif %}
+                  </ul>
+
+                </nav>
             </div>
-            <div class="col-6 text-right">
-{#              {% if user.is_authenticated %}#}
-{#                <p class="pt-3">Logged in as <strong>{{ user.username }}</strong>. <a href="{% url 'logout' %}">Log out</a>.</p>#}
-{#              {% else %}#}
-{#                <a href="{% url 'login' %}" class="btn btn-light" role="button">Log in</a>#}
-{#                <a href="{% url 'signup' %}" class="btn btn-primary" role="button">Sign up</a>#}
-{#              {% endif %}#}
+            <div class="col-3 text-right">
+              {% if user.is_authenticated %}
+                <p class="pt-3">Logged in as <strong>{{ user.username }}</strong>. <a href="{% url 'logout' %}">Log out</a>.</p>
+              {% else %}
+                <a href="{% url 'login' %}" class="btn btn-light" role="button">Log in</a>
+                <a href="{% url 'signup' %}" class="btn btn-primary" role="button">Sign up</a>
+              {% endif %}
             </div>
           </div>
           <div class="card mb-3">
@@ -55,7 +74,7 @@
             </div>
           </div>
           <footer>
-            Wojciech Mojsiejuk Adrian Wolanowski
+            Wojciech Mojsiejuk Adrian Wolanowski Systemy Baz Danych 2019
           </footer>
         </div>
       </div>
