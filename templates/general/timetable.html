@@ -1,21 +1,27 @@
 {% extends 'base.html' %}
 
 {% block content %}
+<p class="lead" >Timetable: {{ week_start |date:"d.m.Y"}} - {{ week_end |date:"d.m.Y"}} </p>
 
-<table class="table table-hover table-striped">
+
+<table id="timetable" class="table table-hover table-striped">
   <thead class="thead-dark">
     <tr>
-        <th scope="col">Period</th>
-        <th scope="col">Monday</th>
-        <th scope="col">Tuesday</th>
-        <th scope="col">Wednesday</th>
-        <th scope="col">Thursday</th>
-        <th scope="col">Friday</th>
+        <th scope="col" style="width: 12.5%" class="text-center">Period</th>
+        <th scope="col" style="width: 12.5%" class="text-center"><a class="text-white">Monday</a></th>
+        <th scope="col" style="width: 12.5%" class="text-center"><a class="text-white">Tuesday</a></th>
+        <th scope="col" style="width: 12.5%" class="text-center"><a class="text-white">Wednesday</a></th>
+        <th scope="col" style="width: 12.5%" class="text-center"><a class="text-white">Thursday</a></th>
+        <th scope="col" style="width: 12.5%" class="text-center"><a class="text-white">Friday</a></th>
+        <th scope="col" style="width: 12.5%" class="text-center"><a class="text-white">Saturday</a></th>
+        <th scope="col" style="width: 12.5%" class="text-center"><a class="text-white">Sunday</a></th>
     </tr>
   </thead>
   <tbody>
     <tr>
       <th scope="row">8:15 - 10:00</th>
+        <td></td>
+        <td></td>
         <td></td>
         <td></td>
         <td></td>
@@ -29,6 +35,8 @@
         <td></td>
         <td></td>
         <td></td>
+        <td></td>
+        <td></td>
     </tr>
    <tr>
       <th scope="row">12:15 - 14:00</th>
@@ -36,11 +44,15 @@
         <td></td>
         <td></td>
         <td></td>
+       <td></td>
+        <td></td>
         <td></td>
 
     </tr>
   <tr>
       <th scope="row">14:15 - 15:50</th>
+        <td></td>
+        <td></td>
         <td></td>
         <td></td>
         <td></td>
@@ -54,9 +66,13 @@
         <td></td>
         <td></td>
         <td></td>
+        <td></td>
+        <td></td>
     </tr>
   <tr>
       <th scope="row">17:40 - 19:15</th>
+        <td></td>
+        <td></td>
         <td></td>
         <td></td>
         <td></td>
@@ -70,7 +86,80 @@
         <td></td>
         <td></td>
         <td></td>
+        <td></td>
+        <td></td>
     </tr>
   </tbody>
 </table>
+    <div class="btn-toolbar" role="toolbar">
+    <div style="width:30%">
+        <a class="align-left btn btn-primary btn-lg btn-block" href="{% url 'students:show_timetable' semester=semester time=last_week week_day=day_of_week%}">Last week</a>
+    </div>
+    <div style="width:40%; padding-left:5%; padding-right: 5%">
+        {% now "d-m-Y" as today %}
+        {% now "w" as today_day%}
+        <a class="align-right btn btn-primary btn-lg btn-block" href="{% url 'students:show_timetable' semester=semester time=today week_day=today_day%}">Current week</a>
+    </div>
+    <div style="width:30%">
+        <a class="align-right btn btn-primary btn-lg btn-block" href="{% url 'students:show_timetable' semester=semester time=next_week week_day=day_of_week%}">Next week</a>
+    </div>
+    </div>
+
+<script>
+    let th_array = document.querySelectorAll("#timetable > thead > tr > th")
+    let th_a_link_array = document.querySelectorAll("#timetable > thead > tr > th > a")
+    let index
+
+    th_a_link_array[0].href="{% url 'students:show_timetable' semester=semester time=monday week_day=1 %}"
+    th_a_link_array[0].title="{{ monday }}"
+
+    th_a_link_array[1].href="{% url 'students:show_timetable' semester=semester time=tuesday week_day=2 %}"
+    th_a_link_array[1].title="{{ tuesday }}"
+
+    th_a_link_array[2].href="{% url 'students:show_timetable' semester=semester time=wednesday week_day=3 %}"
+    th_a_link_array[2].title="{{ wednesday }}"
+
+    th_a_link_array[3].href="{% url 'students:show_timetable' semester=semester time=thursday week_day=4 %}"
+    th_a_link_array[3].title="{{ thursday }}"
+
+    th_a_link_array[4].href="{% url 'students:show_timetable' semester=semester time=friday week_day=5 %}"
+    th_a_link_array[4].title="{{ friday }}"
+
+    th_a_link_array[5].href="{% url 'students:show_timetable' semester=semester time=saturday week_day=6 %}"
+    th_a_link_array[5].title="{{ saturday }}"
+
+    th_a_link_array[6].href="{% url 'students:show_timetable' semester=semester time=sunday week_day=0 %}"
+    th_a_link_array[6].title="{{ sunday }}"
+
+    if(0 === parseInt({{ day_of_week }}))
+    {
+        th_array[7].setAttribute("class", "bg-primary")
+        index=6
+    }
+    else
+    {
+        for(let j=1; j<th_array.length; j++)
+        {
+            if(j === parseInt({{ day_of_week }}))
+            {
+                th_array[j].setAttribute("class", "bg-primary")
+                index=j-1
+            }
+        }
+    }
+
+    let td_array = document.querySelectorAll("#timetable > tbody > tr > td")
+    console.log(index)
+    for(let i=0; i<td_array.length; i++)
+    {
+
+        {#console.log(i)#}
+        if(i%7===index%7)
+        {
+            td_array[i].style.background="rgba(102, 153, 255,0.1)"
+        }
+    }
+
+
+</script>
 {% endblock %}

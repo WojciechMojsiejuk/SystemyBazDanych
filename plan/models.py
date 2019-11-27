@@ -126,6 +126,7 @@ class ZajetoscSal(models.Model):
 
 class Plany(models.Model):
     id_planu = models.AutoField(primary_key=True)
+    id_semestru = models.ForeignKey(Semestry, on_delete=models.CASCADE)
     ObowiazujeOd = models.DateField()
     ObowiazujeDo = models.DateField()
 
@@ -133,12 +134,17 @@ class Plany(models.Model):
         abstract = True
         verbose_name_plural = "Plany"
 
+    def is_current(self):
+        now = datetime.date.today()
+        return self.ObowiazujeOd <= now <= self.ObowiazujeDo
+
 
 class PlanyStudentow(Plany):
     nr_albumu = models.ForeignKey(Studenci, on_delete=models.CASCADE)
 
     class Meta:
         verbose_name_plural = "PlanyStudentow"
+
 
 class PlanyNauczycieli(Plany):
     id_nauczyciela = models.ForeignKey(Nauczyciele, on_delete=models.CASCADE)
