@@ -19,7 +19,7 @@
       <div class="row justify-content-center">
         <div class="col-md-14 col-sm-12">
           <div class="row">
-            <div class="col-9">
+            <div class="col-8">
 
                   <nav class="navbar navbar-expand-md bg-light">
 
@@ -30,9 +30,16 @@
                     </li>
 
                       {% if user.is_authenticated %}
-                        <li class="nav-item">
-                          <a class="nav-link" href=" {% url 'students:universities_list' %}">User's plan</a>
-                        </li>
+                          {% if user.is_student %}
+                            <li class="nav-item">
+                              <a class="nav-link" href=" {% url 'students:universities_list' %}">User's plan</a>
+                            </li>
+                          {% endif %}
+                          {% if user.is_teacher %}
+                            <li class="nav-item">
+                              <a class="nav-link" href=" {% url 'students:universities_list' %}">User's plan</a>
+                            </li>
+                          {% endif %}
                         <li class="nav-item">
                           <a class="nav-link" href="#">Rooms' availability</a>
                         </li>
@@ -42,15 +49,12 @@
                       <li class="nav-item">
                           <a class="nav-link" href="#">Others' plans</a>
                         </li>
-                          <li class="nav-item">
-                          <a class="nav-link" href="#">Rooms reservation</a>
-                        </li>
                       {% endif %}
                   </ul>
 
                 </nav>
             </div>
-            <div class="col-3 text-right">
+            <div class="col-4 text-right">
               {% if user.is_authenticated %}
                 <p class="pt-3">Logged in as <strong>{{ user.username }}</strong>. <a href="{% url 'logout' %}">Log out</a>.</p>
               {% else %}

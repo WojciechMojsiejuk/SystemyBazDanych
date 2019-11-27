@@ -3,20 +3,69 @@
 
 
 {% block content %}
+    <a href="#current_plan" data-toggle="collapse" class="btn btn-outline-secondary btn-lg btn-block text-left"><h3 >Current Plans</h3></a>
+    <div id="current_plan" class="collapse-in">
+        <ul  class="list-group list-group-flush">
+        {% for uczelnia, current_uczelnia_content in current_plan.items %}
 
-<ul class="list-group list-group-flush">
-{% for semester in enrolled_semester  %}
-    {% if semester.is_current %}
-  <a href="#" class="list-group-item list-group-item-action active">
-    {{ semester.id_kierunku.nazwa_kierunku }}
-     {{ semester.id_semestru.nr_semestru }}
-  </a>
-    {% endif %}
-    {% empty %}
-    <p class="lead">
-    You are currently not enrolled for any semester.  <a href="{% url 'students:new_enroll' %}">Enroll</a>. </p>
-  </a>
-{% endfor %}
+                <li class="list-group-item list-group-flush">
+                    <a href="#uczelnia_{{ forloop.counter }}" data-toggle="collapse" class="list-group-item list-group-item-action">
+                        <h4>
+                            {{ uczelnia }}
+                        </h4>
+                    </a>
+                <ul class="list-group list-group-flush">
+                <div class="list-group-item">
+                <div id="uczelnia_{{ forloop.counter }}" class="collapse-in">
+                    {% for wydzial, current_wydzial_content in current_uczelnia_content.items %}
+                        <li class="list-group-item">
+                        <a href="#uczelnia_{{ forloop.parentloop.counter }}_wydzial_{{ forloop.counter }}" data-toggle="collapse" class="list-group-item list-group-item-action">
+                            <h5>
+                                {{ wydzial }}
+                            </h5>
+                        </a>
+
+                        <ul class="list-group list-group-flush">
+                        <div class="list-group-item">
+                        <div id="uczelnia_{{ forloop.parentloop.counter }}_wydzial_{{ forloop.counter }}" class="collapse-in">
+                        {% for kierunek, current_kierunek_content in current_wydzial_content.items %}
+                            <li class="list-group-item"><h5> {{ kierunek }} </h5>
+                            <ul class="list-group list-group-flush">
+                                <a class="list-group-item list-group-item-action"> Semestr {{ current_kierunek_content }}</a>
+                            </ul>
+                            </li>
+                        {% endfor %}
+                        </div>
+                        </div>
+                        </ul>
+                        </li>
+                    {% endfor %}
+                </div>
+                </div>
+                </ul>
+            </li>
+        {% endfor %}
+        </ul>
+    </div>
+
+
+{#{% for uczelnia, current_uczelnia_content in current_plan.items  %}#}
+{#    <h2 class="list-group-item>{{ current_plan.keys }}</h1>#}
+
+{#        <h2 class="list-group-item>{{ wydzial }}</h2>#}
+{#        {% for kierunek, current_kierunek_content in current_wydzial_content %}#}
+{#            <h3 class="list-group-item>{{ kierunek }}</h3>#}
+{#            <a href="#" class="list-group-item list-group-item-action active">#}
+{#            {{ current_kierunek_content  }}#}
+{#            </a>#}
+{#        {% endfor %}#}
+{#    {% endfor %}#}
+{##}
+{#    {% empty %}#}
+{#    <p class="lead">#}
+{#    You are currently not enrolled for any semester.  <a href="{% url 'students:new_enroll' %}">Enroll</a>. </p>#}
+{#  </a>#}
+{#{% endfor %}#}
 
 </ul>
 {%  endblock %}

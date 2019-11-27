@@ -7,8 +7,10 @@ urlpatterns = [
     path('students/', include(([
                                    path('', students.StudentEnrolledSemestersListView.as_view(),
                                         name='universities_list'),
-                                   path('', students.StudentEnrollInSemesterView.as_view(),
+                                   path('Enroll', students.StudentEnrollInSemesterView.as_view(),
                                         name='new_enroll'),
+                                   path('timetable', students.StudentTimeScheduleView.as_view(),
+                                        name='show_timetable'),
 
                                ], 'plan'), namespace='students')),
 ]

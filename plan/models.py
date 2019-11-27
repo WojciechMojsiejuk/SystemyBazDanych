@@ -8,20 +8,44 @@ from django.contrib.auth.models import AbstractUser
 
 
 class Uczelnie(models.Model):
-    nazwa = models.CharField(max_length=100, primary_key=True)
+    nazwa_uczelni = models.CharField(max_length=100, primary_key=True)
     adres_uczelni = models.TextField()
+
+    def __str__(self):
+        return str(self.nazwa_uczelni)
+
+    class Meta:
+        verbose_name_plural = "Uczelnie"
 
 
 class Wydziały(models.Model):
     id_wydzialu = models.AutoField(primary_key=True)
     nazwa_wydzialu = models.CharField(max_length=100)
-    nazwa_uczelni = models.ForeignKey(Uczelnie, on_delete=models.CASCADE)
+    id_uczelni = models.ForeignKey(Uczelnie, on_delete=models.CASCADE)
+    
+    class Meta:
+        verbose_name_plural = "Wydziały"
+
+    def get_uczelnia(self):
+        return Uczelnie.objects.all().get(pk=self.id_uczelni.pk)
+
+    def __str__(self):
+        return str(self.id_uczelni) + ": " + str(self.id_wydzialu) + ": Nazwa: " + str(self.nazwa_wydzialu)
 
 
 class Kierunki(models.Model):
     id_kierunku = models.AutoField(primary_key=True)
     nazwa_kierunku = models.CharField(max_length=100)
     id_wydzialu = models.ForeignKey(Wydziały, on_delete=models.CASCADE)
+
+    def get_wydzial(self):
+        return Wydziały.objects.all().get(pk=self.id_wydzialu.pk)
+
+    class Meta:
+        verbose_name_plural = "Kierunki"
+
+    def __str__(self):
+        return str(self.id_wydzialu) + ": " + str(self.id_kierunku) + ": Nazwa: " + str(self.nazwa_kierunku)
 
 
 class Semestry(models.Model):
@@ -33,6 +57,15 @@ class Semestry(models.Model):
             MinValueValidator(1)
         ]
     )
+
+    class Meta:
+        verbose_name_plural = "Semestry"
+
+    def get_kierunek(self):
+        return Kierunki.objects.all().get(pk=self.id_kierunku.pk)
+
+    def __str__(self):
+        return str(self.id_kierunku) + ": " + str(self.id_semestru) + ": NR: " + str(self.nr_semestru)
 
 
 class User(AbstractUser):
@@ -52,14 +85,20 @@ class Osoby(models.Model):
 
     class Meta:
         abstract = True
+        verbose_name_plural = "Osoby"
+
+    def __str__(self):
+        return str(self.imie) + " " + str(self.nazwisko)
 
 
 class Studenci(Osoby):
-    pass
+    class Meta:
+        verbose_name_plural = "Studenci"
 
 
 class Nauczyciele(Osoby):
-    pass
+    class Meta:
+        verbose_name_plural = "Nauczyciele"
 
 
 class Sale(models.Model):
@@ -69,6 +108,10 @@ class Sale(models.Model):
 
     class Meta:
         unique_together = ['nr_sali', 'id_wydzialu']
+        verbose_name_plural = "Sale"
+
+    def __str__(self):
+        return str(self.id_wydzialu) + ": " + str(self.nr_sali)
 
 
 class ZajetoscSal(models.Model):
@@ -78,6 +121,7 @@ class ZajetoscSal(models.Model):
 
     class Meta:
         unique_together = ['id_sali', 'data_rozpoczecia', 'data_zakonczenia']
+        verbose_name_plural = "ZajetoscSal"
 
 
 class Plany(models.Model):
@@ -87,24 +131,36 @@ class Plany(models.Model):
 
     class Meta:
         abstract = True
+        verbose_name_plural = "Plany"
 
 
 class PlanyStudentow(Plany):
     nr_albumu = models.ForeignKey(Studenci, on_delete=models.CASCADE)
 
+    class Meta:
+        verbose_name_plural = "PlanyStudentow"
 
 class PlanyNauczycieli(Plany):
     id_nauczyciela = models.ForeignKey(Nauczyciele, on_delete=models.CASCADE)
+
+    class Meta:
+        verbose_name_plural = "PlanyNauczycieli"
 
 
 class Przedmioty(models.Model):
     id_przedmiotu = models.AutoField(primary_key=True)
     nazwa_przedmiotu = models.CharField(max_length=50)
 
+    class Meta:
+        verbose_name_plural = "Przedmioty"
+
 
 class PrzedmiotyNauczycieli(models.Model):
     id_przedmiotu = models.ForeignKey(Przedmioty, on_delete=models.CASCADE)
     id_nauczyciela = models.ForeignKey(Nauczyciele, on_delete=models.CASCADE)
+
+    class Meta:
+        verbose_name_plural = "PrzedmiotyNauczycieli"
 
 
 class PrzedmiotyWSemestrze(models.Model):
@@ -119,6 +175,7 @@ class PrzedmiotyWSemestrze(models.Model):
 
     class Meta:
         unique_together = ['id_przedmiotu', 'id_semestru']
+        verbose_name_plural = "PrzedmiotyWSemestrze"
 
 
 class MiejscaZatrudnienia(models.Model):
@@ -127,6 +184,7 @@ class MiejscaZatrudnienia(models.Model):
 
     class Meta:
         unique_together = ['id_wydzialu', 'id_nauczyciela']
+        verbose_name_plural = "MiejscaZatrudnienia"
 
 
 class PlanyZajecUzytkownikow(models.Model):
@@ -153,6 +211,7 @@ class PlanyZajecUzytkownikow(models.Model):
 
     class Meta:
         abstract = True
+        verbose_name_plural = "PlanyZajecUzytkownikow"
 
     unique_together = ['id_planu', 'id_przedmiotu', 'id_nauczyciela', 'id_sali']
 
@@ -163,6 +222,7 @@ class PlanyZajecStudentow(PlanyZajecUzytkownikow):
 
     class Meta:
         unique_together = ['id_planu', 'id_przedmiotu', 'id_nauczyciela', 'id_sali']
+        verbose_name_plural = "PlanyZajecStudentow"
 
 
 class PlanyZajecNauczycieli(PlanyZajecUzytkownikow):
@@ -171,15 +231,19 @@ class PlanyZajecNauczycieli(PlanyZajecUzytkownikow):
 
     class Meta:
         unique_together = ['id_planu', 'id_przedmiotu', 'id_sali']
+        verbose_name_plural = "PlanyZajecNauczycieli"
 
 
 class StudentKierunekSemestr(models.Model):
     id_studenta = models.ForeignKey(Studenci, on_delete=models.CASCADE)
-    id_kierunku = models.ForeignKey(Kierunki, on_delete=models.CASCADE)
     id_semestru = models.ForeignKey(Semestry, on_delete=models.CASCADE)
     data_rozpoczecia = models.DateField()
     data_zakonczenia = models.DateField()
 
+    class Meta:
+        verbose_name_plural = "StudentKierunekSemestr"
+
     def is_current(self):
         now = datetime.date.today()
-        return self.data_rozpoczecia.date() <= now <= self.data_zakonczenia.date()
+        return self.data_rozpoczecia <= now <= self.data_zakonczenia
+
