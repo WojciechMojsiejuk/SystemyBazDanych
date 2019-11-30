@@ -24,3 +24,4 @@ def login(request):
 class RoomsListView(ListView):
     template_name = 'general/rooms_list.html'
     pass
+

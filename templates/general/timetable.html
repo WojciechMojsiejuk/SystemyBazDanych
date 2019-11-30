@@ -1,5 +1,5 @@
 {% extends 'base.html' %}
-
+{% load plan_extras %}
 {% block content %}
 <p class="lead" >Timetable: {{ week_start |date:"d.m.Y"}} - {{ week_end |date:"d.m.Y"}} </p>
 
@@ -19,7 +19,7 @@
   </thead>
   <tbody>
     <tr>
-      <th scope="row">8:15 - 10:00</th>
+        <th scope="row"><span>8:15</span> - <span>10:00</span></th>
         <td></td>
         <td></td>
         <td></td>
@@ -29,7 +29,7 @@
         <td></td>
     </tr>
     <tr>
-      <th scope="row">10:15 - 12:00</th>
+      <th scope="row"><span>10:15</span> - <span>12:00</span></th>
         <td></td>
         <td></td>
         <td></td>
@@ -39,7 +39,7 @@
         <td></td>
     </tr>
    <tr>
-      <th scope="row">12:15 - 14:00</th>
+      <th scope="row"><span>12:15</span> - <span>14:00</span></th>
         <td></td>
         <td></td>
         <td></td>
@@ -50,7 +50,7 @@
 
     </tr>
   <tr>
-      <th scope="row">14:15 - 15:50</th>
+      <th scope="row"><span>14:15</span> - <span>15:50</span></th>
         <td></td>
         <td></td>
         <td></td>
@@ -60,7 +60,7 @@
         <td></td>
     </tr>
   <tr>
-      <th scope="row">16:00 - 17:35</th>
+      <th scope="row"><span>16:00</span> - <span>17:35</span></th>
         <td></td>
         <td></td>
         <td></td>
@@ -70,7 +70,7 @@
         <td></td>
     </tr>
   <tr>
-      <th scope="row">17:40 - 19:15</th>
+      <th scope="row"><span>17:40</span> - <span>19:15</span></th>
         <td></td>
         <td></td>
         <td></td>
@@ -80,7 +80,7 @@
         <td></td>
     </tr>
    <tr>
-      <th scope="row">19:20 - 20:55</th>
+      <th scope="row"><span>19:20</span> - <span>20:55</span></th>
         <td></td>
         <td></td>
         <td></td>
@@ -104,6 +104,46 @@
         <a class="align-right btn btn-primary btn-lg btn-block" href="{% url 'students:show_timetable' semester=semester time=next_week week_day=day_of_week%}">Next week</a>
     </div>
     </div>
+
+    {% for plan in all_plans %}
+        <div class="modal fade" id="detail_{{ forloop.counter }}" tabindex="-1" role="dialog" aria-labelledby="exampleModalLongTitle" aria-hidden="true">
+          <div class="modal-dialog" role="document">
+            <div class="modal-content">
+              <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLongTitle"> {{ plan.id_przedmiotu.nazwa_przedmiotu|linebreaks}} </h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                  <span aria-hidden="true">&times;</span>
+                </button>
+              </div>
+              <div class="modal-body">
+                  <p>
+                      Nr sali: {{ plan.id_sali.id_sali.nr_sali }}
+                  </p>
+                  <p>
+                      Prowadzący: {{ plan.id_nauczyciela.nazwisko }} {{ plan.id_nauczyciela.imie }}
+                  </p>
+                  <p>
+                      Typ: {{ plan.get_typ_zajec_display }}
+                  </p>
+                  <p>
+                      Nr grupy: {{ plan.nr_grupy }}
+                  </p>
+                  <p>
+                      Od: {{ plan.id_sali.data_rozpoczecia|date:"H:i" }}
+                  </p>
+                  <p>
+                      Do: {{ plan.id_sali.data_zakonczenia|date:"H:i" }}
+                  </p>
+              </div>
+              <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+    {% endfor %}
+
 
 <script>
     let th_array = document.querySelectorAll("#timetable > thead > tr > th")
@@ -149,7 +189,6 @@
     }
 
     let td_array = document.querySelectorAll("#timetable > tbody > tr > td")
-    console.log(index)
     for(let i=0; i<td_array.length; i++)
     {
 
@@ -159,6 +198,42 @@
             td_array[i].style.background="rgba(102, 153, 255,0.1)"
         }
     }
+
+    let body_th_array = document.querySelectorAll("#timetable > tbody > tr > th")
+    {#console.log(body_th_array.item(0).children[0].innerHTML)#}
+
+    {% for plan in all_plans %}
+    for(let i=0; i<body_th_array.length; i++)
+    {
+        if("{{ plan.id_sali.data_rozpoczecia|date:"H:i" }}">=body_th_array[i].children[0].innerHTML && "{{ plan.id_sali.data_zakonczenia|date:"H:i" }}"<=body_th_array[i].children[1].innerHTML)
+        {
+            let newPlan = document.createElement("div")
+            newPlan.innerHTML='<a class="btn btn-sm btn-block active" role="button" aria-pressed="true" style="word-wrap: break-word; background: rgba()" data-toggle="modal" data-target="#detail_{{ forloop.counter }}">{{ plan.id_przedmiotu.nazwa_przedmiotu|space_to_new_line|linebreaksbr}}</a>'
+            newPlan.style.width="100%"
+            {% if plan.get_typ_zajec_display == "Wykład" %}
+                newPlan.className += "btn-dark rounded";
+            {% endif %}
+            {% if plan.get_typ_zajec_display == "Ćwiczenia" %}
+                newPlan.className += "btn-primary rounded";
+            {% endif %}
+            {% if plan.get_typ_zajec_display == "Pracownia_specjalistyczna" %}
+                newPlan.className += "btn-success rounded";
+            {% endif %}
+            {% if plan.get_typ_zajec_display == "Laboratiorium" %}
+                newPlan.className += "btn-warning rounded";
+            {% endif %}
+            {% if plan.get_typ_zajec_display == "Seminarium" %}
+                newPlan.className += "btn-danger rounded";
+            {% endif %}
+            {% if plan.get_typ_zajec_display == "Konsultacje" %}
+                newPlan.className += "btn-info rounded";
+            {% endif %}
+            body_th_array[i].parentElement.children[{{ plan.id_sali.data_rozpoczecia|date:"w" }}].appendChild(newPlan)
+            {#console.log()#}
+        }
+    }
+    {% endfor %}
+
 
 
 </script>

@@ -6,7 +6,7 @@ from django.shortcuts import redirect
 from django.views.generic import CreateView, ListView, TemplateView
 
 from ..forms import StudentSignUpForm, StudentEnrollInSemesterForm
-from ..models import User, Uczelnie, StudentKierunekSemestr, Studenci, Semestry
+from ..models import User, Uczelnie, StudentKierunekSemestr, Studenci, Semestry, PlanyStudentow, PlanyZajecStudentow
 from django.utils.decorators import method_decorator
 
 
@@ -121,6 +121,10 @@ class StudentTimeScheduleView(TemplateView):
         last_week = dt - timedelta(days=7)
         last_week = datetime.strftime(last_week, "%d-%m-%Y")
 
+        semester = Semestry.objects.all().get(id_semestru=self.semester)
+        plan = PlanyStudentow.objects.all().get(id_semestru=semester)
+        all_plans = PlanyZajecStudentow.objects.all().filter(id_planu=plan, id_sali__data_rozpoczecia__gte=start, id_sali__data_zakonczenia__lte=end)
+        print(all_plans)
         context['time'] = dt
         context['week_start'] = start
         context['week_end'] = end
@@ -135,6 +139,7 @@ class StudentTimeScheduleView(TemplateView):
         context['last_week'] = last_week
         context['day_of_week'] = self.day_of_week
         context['semester'] = self.semester
+        context['all_plans'] = all_plans
         return context
 
 
