@@ -98,7 +98,7 @@ class StudentEnrolledSemestersListView(TemplateView):
 
 
 class StudentTimeScheduleView(TemplateView):
-    template_name = "general/timetable.html"
+    template_name = "students/../../templates/students/timetable.html"
     time = ""
     day_of_week = ""
     semester = ""

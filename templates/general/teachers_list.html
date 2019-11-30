@@ -1,0 +1,59 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+    <h3>Teachers list</h3>
+
+    <select id="teachers_list" onchange="update()" class="browser-default custom-select col-sm-4">
+    <option selected >Choose the teacher to see his/her plan</option>
+        {% for nauczyciel in nauczyciele_list%}
+            <option value="{{ nauczyciel.pk }}">{{ nauczyciel }}</option>
+        {% endfor %}
+    </select>
+    <a id="teacher_plan_button" class="btn btn-primary" href="#">Show plan</a>
+
+    <script>
+     function update()
+     {
+         let teacher = document.getElementById("teachers_list")
+         let teachers_pk = teacher.options[teacher.selectedIndex].value
+         {% now "d-m-Y" as today %}
+         {% now "w" as today_day_of_week %}
+         let button = document.getElementById("teacher_plan_button")
+         if(Number.isInteger(parseInt(teachers_pk)))
+         {
+             button.href="{% url 'teachers:show_timetable' teacher="teachers_pk" time=today week_day=today_day_of_week %}".replace(/teachers_pk/,teachers_pk)
+
+         }
+         else
+         {
+              button.href="#"
+         }
+
+     }
+    </script>
+
+{#<ul class="list-group list-group-flush">#}
+{##}
+
+{##}
+{#{% for teacher in enrolled_semester  %}#}
+{#    {% if semester.is_current %}#}
+{#  <a href="#" class="list-group-item list-group-item-action active">#}
+{#    {{ semester.id_kierunku.nazwa_kierunku }}#}
+{#     {{ semester.id_semestru.nr_semestru }}#}
+{#  </a>#}
+{#    {% endif %}#}
+{#    {% empty %}#}
+{#    <p class="lead">#}
+{#    You are currently not enrolled for any semester.  <a href="{% url 'students:new_enroll' %}">Enroll</a>. </p>#}
+{#  </a>#}
+{#{% endfor %}#}
+{##}
+{#</ul>#}
+{##}
+
+
+
+
+{%  endblock %}

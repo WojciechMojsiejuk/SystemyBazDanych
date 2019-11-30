@@ -1,6 +1,6 @@
 from django.contrib.auth import login
 from django.shortcuts import redirect
-from django.views.generic import CreateView
+from django.views.generic import CreateView, DetailView
 
 from ..forms import TeacherSignUpForm
 from ..models import User
@@ -19,3 +19,7 @@ class TeacherSignUpView(CreateView):
         user = form.save()
         login(self.request, user)
         return redirect('home')
+
+
+class TeacherTimeScheduleView(DetailView):
+    pass

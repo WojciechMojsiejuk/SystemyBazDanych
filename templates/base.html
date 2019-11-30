@@ -4,15 +4,8 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
     <title>{% block title %}Rozkład Zajęć Strona Główna{% endblock %}</title>
-    <link rel="icon" href="{% static 'img/favicon.png' %}">
     <link href="https://fonts.googleapis.com/css?family=Clicker+Script" rel="stylesheet">
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
-    <link rel="stylesheet" type="text/css" href="{% static 'css/app.css' %}">
-    {% if user.is_authenticated and user.is_teacher %}
-      <link rel="stylesheet" type="text/css" href="{% static 'css/teachers.css' %}">
-    {% else %}
-      <link rel="stylesheet" type="text/css" href="{% static 'css/students.css' %}">
-    {% endif %}
   </head>
   <body>
     <div class="container my-4">
@@ -44,7 +37,7 @@
                           <a class="nav-link" href="#">Rooms' availability</a>
                         </li>
                        <li class="nav-item">
-                          <a class="nav-link" href="#">Teachers' plans</a>
+                          <a class="nav-link" href=" {% url 'teachers:teachers_list' %}">Teachers' plans</a>
                         </li>
                       <li class="nav-item">
                           <a class="nav-link" href="#">Others' plans</a>
