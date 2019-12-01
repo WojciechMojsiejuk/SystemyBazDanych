@@ -22,6 +22,9 @@ urlpatterns = [
                                         name='teachers_list'),
                                    path('timetable/<str:teacher>/<str:time>/<str:week_day>', teachers.TeacherTimeScheduleView.as_view(),
                                         name='teacher_timetable'),
+                                   path('teachers_plans/mine', teachers.teacher_time_schedule_redirect,
+                                        name='teacher_redirect'),
+
                                ], 'plan'), namespace='teachers')),
 
 

@@ -1,3 +1,4 @@
+from django.db.models import Q
 from django.shortcuts import redirect, render
 
 from django.views.generic import TemplateView, ListView
@@ -51,8 +52,10 @@ class TeachersListView(ListView):
             if self.request.user.is_teacher:
                 teacher = Nauczyciele.objects.all().get(user=self.request.user)
                 wydziały = MiejscaZatrudnienia.objects.all().filter(id_nauczyciela=teacher).values('id_wydzialu')
-            nauczyciele = MiejscaZatrudnienia.objects.all().filter(id_wydzialu__in=list(set(wydziały))).values('id_nauczyciela')
-            return Nauczyciele.objects.all().filter(user__in=nauczyciele)
+                print(teacher)
+                print(wydziały)
+            nauczyciele = MiejscaZatrudnienia.objects.all().filter(id_wydzialu__in=wydziały).values('id_nauczyciela')
+            return Nauczyciele.objects.all().filter(Q(user__in=nauczyciele) & ~Q(user=teacher))
         else:
             return None
 
