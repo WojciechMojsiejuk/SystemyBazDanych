@@ -71,10 +71,13 @@ class RoomsListView(ListView):
         if self.request.user.is_authenticated:
             if self.request.user.is_teacher:
                 nauczyciel = Nauczyciele.objects.all().get(user=self.request.user)
+                #print(nauczyciel)
                 wydzial_nauczyciela = MiejscaZatrudnienia.objects.all().filter(id_nauczyciela=nauczyciel).values('id_wydzialu')
+                #print(wydzial_nauczyciela)
                 sale = Sale.objects.all().filter(id_wydzialu__in=wydzial_nauczyciela)
+                #print(sale)
                 return sale
-             else:
+            else:
                 return None
         else:
             return None

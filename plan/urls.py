@@ -31,5 +31,5 @@ urlpatterns = [
                                         name='room_availability'),
                                     path('<str:room>/<str:date>/<str:week_day>', general.RoomsAvailabilityView.as_view(),
                                         name='booked_rooms'),
-                                ], 'rooms'), namespace='rooms')),
+                                ], 'plan'), namespace='rooms')),
 ]
