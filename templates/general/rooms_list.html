@@ -2,19 +2,14 @@
 
 {% block content %}
 
-<ul class="list-group list-group-flush">
-{% for semester in enrolled_semester  %}
-    {% if semester.is_current %}
-  <a href="#" class="list-group-item list-group-item-action active">
-    {{ semester.id_kierunku.nazwa_kierunku }}
-     {{ semester.id_semestru.nr_semestru }}
-  </a>
-    {% endif %}
-    {% empty %}
-    <p class="lead">
-    You are currently not enrolled for any semester.  <a href="{% url 'students:new_enroll' %}">Enroll</a>. </p>
-  </a>
-{% endfor %}
+  <h3>Rooms list</h3>
 
-</ul>
+  <select id="rooms_list" onchange="update()" class="browser-default custom-select col-sm-4">
+  <option selected >Choose room you want to book</option>
+      {% for room in room_list%}
+          <option value="{{ room.pk }}">{{ room }}</option>
+      {% endfor %}
+  </select>
+  <a id="room_availability" class="btn btn-primary" href="#">Show availability</a>
+
 {%  endblock %}

@@ -26,6 +26,10 @@ urlpatterns = [
                                         name='teacher_redirect'),
 
                                ], 'plan'), namespace='teachers')),
-
-
+    path('room_availability/', include(([
+                                    path('', general.RoomsListView.as_view(),
+                                        name='room_availability'),
+                                    path('<str:room>/<str:date>/<str:week_day>', general.RoomsAvailabilityView.as_view(),
+                                        name='booked_rooms'),
+                                ], 'rooms'), namespace='rooms')),
 ]
