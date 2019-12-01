@@ -74,6 +74,8 @@ class RoomsListView(ListView):
                 wydzial_nauczyciela = MiejscaZatrudnienia.objects.all().filter(id_nauczyciela=nauczyciel).values('id_wydzialu')
                 sale = Sale.objects.all().filter(id_wydzialu__in=wydzial_nauczyciela)
                 return sale
+             else:
+                return None
         else:
             return None
 
