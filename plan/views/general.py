@@ -1,10 +1,11 @@
 from django.db.models import Q
-from django.shortcuts import redirect, render
+from django.shortcuts import render
 
-from django.views.generic import TemplateView, ListView
+from django.views.generic import TemplateView, ListView, CreateView
 from django.contrib.auth.decorators import login_required
 from django.utils.decorators import method_decorator
 from datetime import datetime, timedelta
+
 from plan.models import Nauczyciele, StudentKierunekSemestr, Studenci, Semestry, MiejscaZatrudnienia, Sale, Wydziały, ZajetoscSal
 
 
@@ -133,3 +134,9 @@ class RoomsAvailabilityView(TemplateView):
         context['room'] = self.room
         context['booked_rooms'] = booked_rooms
         return context
+
+
+class ReservationCreateView(CreateView):
+    model = ZajetoscSal
+    template_name = 'registration/signup_form.html'
+    fields = ['']

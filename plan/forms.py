@@ -1,7 +1,9 @@
 from django import forms
 from django.contrib.auth.forms import UserCreationForm
 from django.db import transaction
-from plan.models import Studenci, User, Nauczyciele, StudentKierunekSemestr, Kierunki, Semestry
+from django.forms import Form
+
+from plan.models import Studenci, User, Nauczyciele, StudentKierunekSemestr, Kierunki, Semestry, ZajetoscSal, Sale
 
 
 class StudentSignUpForm(UserCreationForm):
@@ -50,12 +52,10 @@ class TeacherSignUpForm(UserCreationForm):
         )
         return user
 
-
-class StudentEnrollInSemesterForm(forms.ModelForm):
-    # ToDo: Dokończyć formularz zapisu studenta na kierunki
-    class Meta:
-        model = StudentKierunekSemestr
-        fields = ('id_studenta', 'id_semestru', 'data_rozpoczecia', 'data_zakonczenia')
-    # id_kierunku = forms.ModelChoiceField(queryset=Kierunki.objects.all())
-    # id_semestru = forms.ModelChoiceField(queryset=Semestry.objects.filter(id_kierunku=id_kierunku))
-    pass
+#
+# class ReservationCreateForm(Form):
+#     data_rozpoczecia = forms.DateTimeField()
+#     data_zakonczenia = forms.DateTimeField()
+#
+#     class Meta:
+#         model = ZajetoscSal
