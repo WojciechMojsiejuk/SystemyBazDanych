@@ -1,7 +1,9 @@
 from django.shortcuts import redirect, render
 from django.views.generic import TemplateView, ListView
-
-from plan.models import Nauczyciele, StudentKierunekSemestr, Studenci, Semestry, MiejscaZatrudnienia, Sale, Wydziały
+from django.contrib.auth.decorators import login_required
+from django.utils.decorators import method_decorator
+from datetime import datetime, timedelta
+from plan.models import Nauczyciele, StudentKierunekSemestr, Studenci, Semestry, MiejscaZatrudnienia, Sale, Wydziały, ZajetoscSal
 
 
 class SignUpView(TemplateView):
@@ -58,3 +60,54 @@ class RoomsListView(ListView):
             return None
 
     #pass
+
+class RoomsAvailabilityView(TemplateView):
+    template_name = 'general/timetable.html'
+    date = ""
+    day_of_week = ""
+    room = ""
+
+    @method_decorator(login_required)
+    def dispatch(self, *args, **kwargs):
+        self.date = kwargs.get('date', datetime.now)
+        self.day_of_week = kwargs.get('week_day', None)
+        self.room = kwargs.get('room', None)
+        return super(RoomsAvailabilityView, self).dispatch(*args, **kwargs)
+
+    def get_context_data(self, **kwargs):
+        # Call the base implementation first to get the context
+        context = super(RoomsAvailabilityView, self).get_context_data(**kwargs)
+        dt = datetime.strptime(self.date, "%d-%m-%Y")
+        start = dt - timedelta(days=dt.weekday())
+        end = start + timedelta(days=6)
+        week_dmy = [datetime.strftime(start + timedelta(days=x), "%d-%m-%Y") for x in range(0, (end - start).days+1)]
+        next_week = dt + timedelta(days=7)
+        next_week = datetime.strftime(next_week, "%d-%m-%Y")
+        last_week = dt - timedelta(days=7)
+        last_week = datetime.strftime(last_week, "%d-%m-%Y")
+
+        wybrana_sala = Sale.objects.all().get(nr_sali=self.room)
+        nr_pokoju = wybrana_sala.nr_sali
+
+        print(nr_pokoju)
+        nauczyciel = Nauczyciele.objects.all().get(user=self.request.user)
+        wydzial = MiejscaZatrudnienia.objects.all().filter(id_nauczyciela=nauczyciel).values('id_wydzialu')
+        sala = Sale.objects.all().filter(id_wydzialu__in=wydzial, nr_sali__in=nr_pokoju)
+        booked_rooms = ZajetoscSal.objects.all().filter(id_sali__in=sala, data_rozpoczecia__gte=start, data_zakonczenia__lte=end)
+        print(booked_rooms)
+        context['time'] = dt
+        context['week_start'] = start
+        context['week_end'] = end
+        context['monday'] = week_dmy[0]
+        context['tuesday'] = week_dmy[1]
+        context['wednesday'] = week_dmy[2]
+        context['thursday'] = week_dmy[3]
+        context['friday'] = week_dmy[4]
+        context['saturday'] = week_dmy[5]
+        context['sunday'] = week_dmy[6]
+        context['next_week'] = next_week
+        context['last_week'] = last_week
+        context['day_of_week'] = self.day_of_week
+        context['room'] = self.room
+        context['booked_rooms'] = booked_rooms
+        return context

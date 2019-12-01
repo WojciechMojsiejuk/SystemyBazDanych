@@ -1,0 +1,153 @@
+{% extends 'base.html' %}
+{% load plan_extras %}
+{% block content %}
+<p class="lead" >Timetable: {{ week_start |date:"d.m.Y"}} - {{ week_end |date:"d.m.Y"}} </p>
+
+
+<table id="timetable" class="table table-hover table-striped">
+  <thead class="thead-dark">
+    <tr>
+        <th scope="col" style="width: 12.5%" class="text-center">Period</th>
+        <th scope="col" style="width: 12.5%" class="text-center"><a class="text-white">Monday</a></th>
+        <th scope="col" style="width: 12.5%" class="text-center"><a class="text-white">Tuesday</a></th>
+        <th scope="col" style="width: 12.5%" class="text-center"><a class="text-white">Wednesday</a></th>
+        <th scope="col" style="width: 12.5%" class="text-center"><a class="text-white">Thursday</a></th>
+        <th scope="col" style="width: 12.5%" class="text-center"><a class="text-white">Friday</a></th>
+        <th scope="col" style="width: 12.5%" class="text-center"><a class="text-white">Saturday</a></th>
+        <th scope="col" style="width: 12.5%" class="text-center"><a class="text-white">Sunday</a></th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+        <th scope="row"><span>8:15</span> - <span>10:00</span></th>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+    </tr>
+    <tr>
+      <th scope="row"><span>10:15</span> - <span>12:00</span></th>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+    </tr>
+   <tr>
+      <th scope="row"><span>12:15</span> - <span>14:00</span></th>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+       <td></td>
+        <td></td>
+        <td></td>
+
+    </tr>
+  <tr>
+      <th scope="row"><span>14:15</span> - <span>15:50</span></th>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+    </tr>
+  <tr>
+      <th scope="row"><span>16:00</span> - <span>17:35</span></th>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+    </tr>
+  <tr>
+      <th scope="row"><span>17:40</span> - <span>19:15</span></th>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+    </tr>
+   <tr>
+      <th scope="row"><span>19:20</span> - <span>20:55</span></th>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+    </tr>
+  </tbody>
+</table>
+    <div class="btn-toolbar" role="toolbar">
+    <div style="width:30%">
+        <a class="align-left btn btn-primary btn-lg btn-block" href="{% url 'rooms:booked_rooms' room=room date=last_week week_day=day_of_week%}">Last week</a>
+    </div>
+    <div style="width:40%; padding-left:5%; padding-right: 5%">
+        {% now "d-m-Y" as today %}
+        {% now "w" as today_day%}
+        <a class="align-right btn btn-primary btn-lg btn-block" href="{% url 'rooms:booked_rooms' room=room date=today week_day=today_day%}">Current week</a>
+    </div>
+    <div style="width:30%">
+        <a class="align-right btn btn-primary btn-lg btn-block" href="{% url 'rooms:booked_rooms' room=room date=next_week week_day=day_of_week%}">Next week</a>
+    </div>
+    </div>
+
+        {% for plan in all_plans %}
+        <div class="modal fade" id="detail_{{ forloop.counter }}" tabindex="-1" role="dialog" aria-labelledby="exampleModalLongTitle" aria-hidden="true">
+          <div class="modal-dialog" role="document">
+            <div class="modal-content">
+              <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLongTitle"> {{ plan.id_przedmiotu.nazwa_przedmiotu|linebreaks}} </h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                  <span aria-hidden="true">&times;</span>
+                </button>
+              </div>
+              <div class="modal-body">
+                  <p>
+                      Nr sali: {{ plan.id_sali.id_sali.nr_sali }}
+                  </p>
+                  <p>
+                      Lokalizacja: {{ plan.id_sali.id_sali.id_wydzialu.nazwa_wydzialu}}
+                  </p>
+                  <p>
+                      Semestr: {{ plan.plan_studentow.id_planu.id_semestru.id_kierunku.nazwa_kierunku }} {{ plan.plan_studentow.id_planu.id_semestru.nr_semestru }}
+                  </p>
+                  <p>
+                      Typ: {{ plan.get_typ_zajec_display }}
+                  </p>
+                  <p>
+                      Nr grupy: {{ plan.nr_grupy }}
+                  </p>
+                  <p>
+                      Od: {{ plan.id_sali.data_rozpoczecia|date:"H:i" }}
+                  </p>
+                  <p>
+                      Do: {{ plan.id_sali.data_zakonczenia|date:"H:i" }}
+                  </p>
+              </div>
+              <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+    {% endfor %}
+
+
+
+
+{% endblock %}
