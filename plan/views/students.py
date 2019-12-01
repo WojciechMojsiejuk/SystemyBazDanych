@@ -2,6 +2,7 @@ from datetime import datetime, timedelta
 
 from django.contrib.auth import login
 from django.contrib.auth.decorators import login_required
+from django.db.models import Q
 from django.shortcuts import redirect
 from django.views.generic import CreateView, ListView, TemplateView
 
@@ -143,3 +144,21 @@ class StudentTimeScheduleView(TemplateView):
         return context
 
 
+class StudentsListView(ListView):
+    template_name = 'students/students_list.html'
+    model = StudentKierunekSemestr
+
+    # We are only interested in students who study in the users faculties the same major
+    def get_queryset(self):
+
+        if self.request.user.is_authenticated:
+            if self.request.user.is_student:
+                student = Studenci.objects.all().get(user=self.request.user)
+                semestry_studenta = StudentKierunekSemestr.objects.all().filter(id_studenta=student).values('id_semestru')
+                semestry = Semestry.objects.all().filter(id_semestru__in=semestry_studenta)
+                studenci = StudentKierunekSemestr.objects.all().filter(Q(id_semestru__in=semestry))
+                # & ~Q(id_studenta=student)
+                print(studenci)
+                return studenci
+        else:
+            return None

@@ -37,6 +37,9 @@ class TeachersListView(ListView):
                 semestry = Semestry.objects.all().filter(id_semestru__in=semestry_studenta)
                 for semestr in semestry:
                     wydziały.append(semestr.get_kierunek().get_wydzial())
+            if self.request.user.is_teacher:
+                teacher = Nauczyciele.objects.all().get(user=self.request.user)
+                wydzialy = MiejscaZatrudnienia.objects.all().filter(id_nauczyciela=teacher).values('id_wydzialu')
             nauczyciele = MiejscaZatrudnienia.objects.all().filter(id_wydzialu__in=list(set(wydziały))).values('id_nauczyciela')
             return Nauczyciele.objects.all().filter(user__in=nauczyciele)
         else:

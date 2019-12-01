@@ -22,7 +22,7 @@
          let button = document.getElementById("teacher_plan_button")
          if(Number.isInteger(parseInt(teachers_pk)))
          {
-             button.href="{% url 'teachers:show_timetable' teacher="teachers_pk" time=today week_day=today_day_of_week %}".replace(/teachers_pk/,teachers_pk)
+             button.href="{% url 'teachers:teacher_timetable' teacher="teachers_pk" time=today week_day=today_day_of_week %}".replace(/teachers_pk/,teachers_pk)
 
          }
          else
