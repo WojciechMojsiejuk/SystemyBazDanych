@@ -1,11 +1,47 @@
 {% extends 'base.html' %}
 
 {% block content %}
-  <h2>Welcome to the Degra Schedule System <span class="icon-emo-happy"></span></h2>
-  <p class="lead">
+  <h2>Welcome to the Degra Schedule System{% if user.is_authenticated %}, {{ degra_user.imie }} :){% endif %} </h2>
+    {% if not user.is_authenticated %}
+    <p class="lead">
     If you already have an account, go ahead and <a href="{% url 'login' %}">log in</a>. </p>
     <hr>
+
     <p class="lead">If you are new to Degra, get started
     by creating a <a href="{% url 'student_signup' %}">student account</a> or a <a href="{% url 'teacher_signup' %}">teacher account</a>.
-  </p>
+    </p>
+    {% endif %}
+    {% if user.is_authenticated %}
+    <p class="lead">
+    We wanted to make sure you have everything you need within reach.
+        </p> <hr>
+    <p class="lead"> You can check your plans
+        {% if user.is_student %}
+            <a href="{% url 'students:universities_list' %}"> here</a>.
+        {% endif %}
+        {% if user.is_teacher %}
+            {% now "d-m-Y" as today %}
+            {% now "w" as today_day_of_week %}
+            <a href="{% url 'teachers:teacher_timetable' teacher=degra_user.pk time=today week_day=today_day_of_week %}"> here</a>.
+        {% endif %}
+    </p>
+    <p class="lead">
+        You can check rooms' availability {% if user.is_teacher %} and manage reservations {% endif %}<a href=#">here</a>.
+    </p>
+    <p class="lead">
+        You can check your
+        {% if user.is_teacher %}coworkers {% endif %}
+        {% if user.is_student %}teachers {% endif %}schedule
+        <a href="{% url 'teachers:teachers_list' %}">here</a>.
+    </p>
+    {% if user.is_student %}
+         <p class="lead">You can check your classmates schedule <a href="{% url 'students:students_list' %}">here</a>. </p>
+    {% endif %}
+    <hr>
+    <p class="lead">
+    If you want you can <a href="{% url 'login' %}">switch account</a>.
+    </p>
+
+
+    {% endif %}
 {% endblock %}

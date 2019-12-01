@@ -6,8 +6,8 @@ from .views import general, students, teachers
 
 urlpatterns = [
 
-    path('', general.home, name='home'),
-    path('home/', general.home, name='home'),
+    path('', general.HomeView.as_view(), name='home'),
+    path('home/', general.HomeView.as_view(), name='home'),
     path('students/', include(([
                                    path('', students.StudentEnrolledSemestersListView.as_view(),
                                         name='universities_list'),
