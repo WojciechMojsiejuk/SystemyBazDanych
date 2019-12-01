@@ -5,9 +5,9 @@
   <h3>Rooms list</h3>
 
   <select id="rooms_list" onchange="update()" class="browser-default custom-select col-sm-4">
-  <option selected >Choose room you want to book</option>
+  <option selected >Choose room to see its availability</option>
       {% for room in sale_list%}
-          <option value="{{ room.pk }}">{{ room.id_wydzialu.nazwa_wydzialu }} Sala nr {{ room.nr }}</option>
+          <option value="{{ room.id_sali }}">{{ room.id_wydzialu.nazwa_wydzialu }} Sala nr {{ room.nr_sali }}</option>
       {% endfor %}
   </select>
   <a id="room_availability" class="btn btn-primary" href="#">Show availability</a>
@@ -16,7 +16,7 @@
    function update()
    {
        let room = document.getElementById("rooms_list")
-       #let room_pk = room.options[room.selectedIndex].value
+       let room_pk = room.options[room.selectedIndex].value
        console.log(room_pk)
        {% now "d-m-Y" as today %}
        {% now "w" as today_day_of_week %}

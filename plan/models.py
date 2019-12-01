@@ -64,6 +64,9 @@ class Semestry(models.Model):
     def get_kierunek(self):
         return Kierunki.objects.all().get(pk=self.id_kierunku.pk)
 
+    def get_przedmioty(self):
+        return PrzedmiotyWSemestrze.objects.all().filter(id_semestru=self)
+
     def __str__(self):
         return str(self.id_kierunku) + ": " + str(self.id_semestru) + ": NR: " + str(self.nr_semestru)
 
@@ -122,6 +125,9 @@ class ZajetoscSal(models.Model):
     class Meta:
         unique_together = ['id_sali', 'data_rozpoczecia', 'data_zakonczenia']
         verbose_name_plural = "ZajetoscSal"
+
+    def get_plans(self):
+        return PlanyZajecNauczycieli.objects.all().get(id_sali=self), PlanyZajecStudentow.objects.all().get(id_sali=self)
 
 
 class Plany(models.Model):

@@ -1,12 +1,14 @@
 from django.db.models import Q
 from django.shortcuts import render
+from django.views import View
 
 from django.views.generic import TemplateView, ListView, CreateView
 from django.contrib.auth.decorators import login_required
 from django.utils.decorators import method_decorator
 from datetime import datetime, timedelta
 
-from plan.models import Nauczyciele, StudentKierunekSemestr, Studenci, Semestry, MiejscaZatrudnienia, Sale, Wydziały, ZajetoscSal
+from plan.models import Nauczyciele, StudentKierunekSemestr, Studenci, Semestry, MiejscaZatrudnienia, Sale, Wydziały, \
+    ZajetoscSal, PlanyNauczycieli, PlanyZajecStudentow, PrzedmiotyNauczycieli, Przedmioty, PlanyStudentow
 
 
 class SignUpView(TemplateView):
@@ -53,11 +55,10 @@ class TeachersListView(ListView):
                 semestry = Semestry.objects.all().filter(id_semestru__in=semestry_studenta)
                 for semestr in semestry:
                     wydziały.append(semestr.get_kierunek().get_wydzial())
+                wydziały = list(set(wydziały))
             if self.request.user.is_teacher:
                 teacher = Nauczyciele.objects.all().get(user=self.request.user)
                 wydziały = MiejscaZatrudnienia.objects.all().filter(id_nauczyciela=teacher).values('id_wydzialu')
-                print(teacher)
-                print(wydziały)
             nauczyciele = MiejscaZatrudnienia.objects.all().filter(id_wydzialu__in=wydziały).values('id_nauczyciela')
             return Nauczyciele.objects.all().filter(Q(user__in=nauczyciele) & ~Q(user=teacher))
         else:
@@ -70,16 +71,19 @@ class RoomsListView(ListView):
 
     def get_queryset(self):
         if self.request.user.is_authenticated:
+            wydziały = []
             if self.request.user.is_teacher:
                 nauczyciel = Nauczyciele.objects.all().get(user=self.request.user)
-                #print(nauczyciel)
-                wydzial_nauczyciela = MiejscaZatrudnienia.objects.all().filter(id_nauczyciela=nauczyciel).values('id_wydzialu')
-                #print(wydzial_nauczyciela)
-                sale = Sale.objects.all().filter(id_wydzialu__in=wydzial_nauczyciela)
-                #print(sale)
-                return sale
-            else:
-                return None
+                wydziały = MiejscaZatrudnienia.objects.all().filter(id_nauczyciela=nauczyciel).values('id_wydzialu')
+            elif self.request.user.is_student:
+                student = Studenci.objects.all().get(user=self.request.user)
+                semestry_studenta = StudentKierunekSemestr.objects.all().filter(id_studenta=student).values("id_semestru")
+                semestry = Semestry.objects.all().filter(id_semestru__in=semestry_studenta)
+                for semestr in semestry:
+                    wydziały.append(semestr.get_kierunek().get_wydzial())
+                wydziały = list(set(wydziały))
+            sale = Sale.objects.all().filter(id_wydzialu__in=wydziały)
+            return sale
         else:
             return None
 
@@ -109,15 +113,23 @@ class RoomsAvailabilityView(TemplateView):
         last_week = dt - timedelta(days=7)
         last_week = datetime.strftime(last_week, "%d-%m-%Y")
 
-        wybrana_sala = Sale.objects.all().get(nr_sali=self.room)
-        nr_pokoju = wybrana_sala.nr_sali
+        room = Sale.objects.all().get(id_sali=self.room)
+        booked = ZajetoscSal.objects.all().filter(id_sali=room, data_rozpoczecia__gte=start, data_zakonczenia__lte=end)
 
-        print(nr_pokoju)
-        nauczyciel = Nauczyciele.objects.all().get(user=self.request.user)
-        wydzial = MiejscaZatrudnienia.objects.all().filter(id_nauczyciela=nauczyciel).values('id_wydzialu')
-        sala = Sale.objects.all().filter(id_wydzialu__in=wydzial, nr_sali__in=nr_pokoju)
-        booked_rooms = ZajetoscSal.objects.all().filter(id_sali__in=sala, data_rozpoczecia__gte=start, data_zakonczenia__lte=end)
-        print(booked_rooms)
+        teacher_plans = None
+        students_plans = None
+        teacher_subjects = None
+        if self.request.user.is_teacher:
+            teacher = Nauczyciele.objects.all().get(user=self.request.user)
+            teacher_plans = PlanyNauczycieli.objects.all().filter(id_nauczyciela=teacher)
+            students_plan_list = PlanyZajecStudentow.objects.all().filter(id_nauczyciela=teacher).values("id_planu")
+            students_plans = list(set(PlanyStudentow.objects.all().filter(id_planu__in=students_plan_list)))
+            teacher_subjects_list = PrzedmiotyNauczycieli.objects.all().filter(id_nauczyciela=teacher).values("id_przedmiotu")
+            teacher_subjects = Przedmioty.objects.all().filter(id_przedmiotu__in=teacher_subjects_list)
+        print(students_plans)
+        context['students_plans'] = students_plans
+        context['teacher_plans'] = teacher_plans
+        context['teacher_subjects'] = teacher_subjects
         context['time'] = dt
         context['week_start'] = start
         context['week_end'] = end
@@ -131,12 +143,11 @@ class RoomsAvailabilityView(TemplateView):
         context['next_week'] = next_week
         context['last_week'] = last_week
         context['day_of_week'] = self.day_of_week
-        context['room'] = self.room
-        context['booked_rooms'] = booked_rooms
+        context['room'] = room
+        context['booked'] = booked
         return context
 
 
-class ReservationCreateView(CreateView):
-    model = ZajetoscSal
-    template_name = 'registration/signup_form.html'
-    fields = ['']
+class ReservationCreateView(View):
+    pass
+
