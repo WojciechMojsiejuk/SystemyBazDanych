@@ -105,7 +105,7 @@
     </div>
     </div>
 
-        {% for plan in all_plans %}
+        {% for plan in booked_rooms %}
         <div class="modal fade" id="detail_{{ forloop.counter }}" tabindex="-1" role="dialog" aria-labelledby="exampleModalLongTitle" aria-hidden="true">
           <div class="modal-dialog" role="document">
             <div class="modal-content">
@@ -147,7 +147,96 @@
 
     {% endfor %}
 
+    <script>
+        let th_array = document.querySelectorAll("#timetable > thead > tr > th")
+        let th_a_link_array = document.querySelectorAll("#timetable > thead > tr > th > a")
+        let index
+        th_a_link_array[0].href="{% url 'rooms:booked_rooms' room=room date=monday week_day=1 %}"
+        th_a_link_array[0].title="{{ monday }}"
+        th_a_link_array[1].href="{% url 'rooms:booked_rooms' room=room date=tuesday week_day=2 %}"
+        th_a_link_array[1].title="{{ tuesday }}"
+        th_a_link_array[2].href="{% url 'rooms:booked_rooms' room=room date=wednesday week_day=3 %}"
+        th_a_link_array[2].title="{{ wednesday }}"
+        th_a_link_array[3].href="{% url 'rooms:booked_rooms' room=room date=thursday week_day=4 %}"
+        th_a_link_array[3].title="{{ thursday }}"
+        th_a_link_array[4].href="{% url 'rooms:booked_rooms' room=room date=friday week_day=5 %}"
+        th_a_link_array[4].title="{{ friday }}"
+        th_a_link_array[5].href="{% url 'rooms:booked_rooms' room=room date=saturday week_day=6 %}"
+        th_a_link_array[5].title="{{ saturday }}"
+        th_a_link_array[6].href="{% url 'rooms:booked_rooms' room=room date=sunday week_day=0 %}"
+        th_a_link_array[6].title="{{ sunday }}"
+        if(0 === parseInt({{ day_of_week }}))
+        {
+            th_array[7].setAttribute("class", "bg-primary")
+            index=6
+        }
+        else
+        {
+            for(let j=1; j<th_array.length; j++)
+            {
+                if(j === parseInt({{ day_of_week }}))
+                {
+                    th_array[j].setAttribute("class", "bg-primary")
+                    index=j-1
+                }
+            }
+        }
+        let td_array = document.querySelectorAll("#timetable > tbody > tr > td")
+        for(let i=0; i<td_array.length; i++)
+        {
+            {#console.log(i)#}
+            if(i%7===index%7)
+            {
+                td_array[i].style.background="rgba(102, 153, 255,0.1)"
+            }
+        }
+        let body_th_array = document.querySelectorAll("#timetable > tbody > tr > th")
+        {#console.log(body_th_array.item(0).children[0].innerHTML)#}
+        {% for plan in booked_rooms %}
+        for(let i=0; i<body_th_array.length; i++)
+        {
+            if("{{ plan.id_sali.data_rozpoczecia|date:"H:i" }}">=body_th_array[i].children[0].innerHTML && "{{ plan.id_sali.data_zakonczenia|date:"H:i" }}"<=body_th_array[i].children[1].innerHTML)
+            {
+                let newPlan = document.createElement("div")
+                newPlan.innerHTML='<a class="btn btn-sm btn-block active" role="button" aria-pressed="true" style="word-wrap: break-word; background: rgba()" data-toggle="modal" data-target="#detail_{{ forloop.counter }}">{{ plan.id_przedmiotu.nazwa_przedmiotu|space_to_new_line|linebreaksbr}}</a>'
+                newPlan.style.width="100%"
+                {% if plan.get_typ_zajec_display == "Wykład" %}
+                    newPlan.className += "btn-dark rounded";
+                {% endif %}
+                {% if plan.get_typ_zajec_display == "Ćwiczenia" %}
+                    newPlan.className += "btn-primary rounded";
+                {% endif %}
+                {% if plan.get_typ_zajec_display == "Pracownia_specjalistyczna" %}
+                    newPlan.className += "btn-success rounded";
+                {% endif %}
+                {% if plan.get_typ_zajec_display == "Laboratiorium" %}
+                    newPlan.className += "btn-warning rounded";
+                {% endif %}
+                {% if plan.get_typ_zajec_display == "Seminarium" %}
+                    newPlan.className += "btn-danger rounded";
+                {% endif %}
+                {% if plan.get_typ_zajec_display == "Konsultacje" %}
+                    newPlan.className += "btn-info rounded";
+                {% endif %}
+                body_th_array[i].parentElement.children[{{ plan.id_sali.data_rozpoczecia|date:"w" }}].appendChild(newPlan)
+                {#console.log()#}
+            }
+        }
+        {% endfor %}
 
+        for(let i=0; i<td_array.length; i++)
+        {
+            if(i%7===index%7)
+            {
+              //Idk if that's gonna work
+              if(td_array[i].innerHTML != null){
+                td_array[i].innerHTML="<button type=button style='background:#4CAF50; width:100px; height:38px; border-radius:12px; border:2px solid black' onClick=alert('dziala')>+</button>"
+                td_array[i].style.textAlign='center'
+              }
+            }
+        }
+
+    </script>
 
 
 {% endblock %}

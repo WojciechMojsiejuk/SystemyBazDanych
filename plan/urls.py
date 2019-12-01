@@ -33,5 +33,6 @@ urlpatterns = [
                                         name='booked_rooms'),
                                     path('add', general.ReservationCreateView.as_view(),
                                         name='add_reservation'),
-                                ], 'rooms'), namespace='rooms')),
+                                ], 'plan'), namespace='rooms')),
+
 ]

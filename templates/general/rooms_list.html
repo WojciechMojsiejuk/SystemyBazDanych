@@ -12,4 +12,26 @@
   </select>
   <a id="room_availability" class="btn btn-primary" href="#">Show availability</a>
 
+  <script>
+   function update()
+   {
+       let room = document.getElementById("rooms_list")
+       #let room_pk = room.options[room.selectedIndex].value
+       console.log(room_pk)
+       {% now "d-m-Y" as today %}
+       {% now "w" as today_day_of_week %}
+       let button = document.getElementById("room_availability")
+       if(Number.isInteger(parseInt(room_pk)))
+       {
+           button.href="{% url 'rooms:booked_rooms' room="room_pk" date=today week_day=today_day_of_week %}".replace(/room_pk/,room_pk)
+
+       }
+       else
+       {
+            button.href="#"
+       }
+
+   }
+  </script>
+
 {%  endblock %}
