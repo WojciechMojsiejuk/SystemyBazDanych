@@ -30,7 +30,7 @@
                           {% endif %}
                           {% if user.is_teacher %}
                             <li class="nav-item">
-                              <a class="nav-link" href="#">User's plan</a>
+                              <a class="nav-link" href="{% url 'teachers:teacher_redirect' %}">User's plan</a>
                             </li>
                           {% endif %}
                         <li class="nav-item">
@@ -39,9 +39,11 @@
                        <li class="nav-item">
                           <a class="nav-link" href=" {% url 'teachers:teachers_list' %}">Teachers' plans</a>
                         </li>
+                          {% if user.is_student %}
                       <li class="nav-item">
                           <a class="nav-link" href=" {% url 'students:students_list' %}">Others' plans</a>
                         </li>
+                              {% endif %}
                       {% endif %}
                   </ul>
 

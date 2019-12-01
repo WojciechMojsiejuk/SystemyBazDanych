@@ -4,7 +4,7 @@ from django.contrib.auth import login
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import redirect
 from django.utils.decorators import method_decorator
-from django.views.generic import CreateView, TemplateView
+from django.views.generic import CreateView, TemplateView, RedirectView
 
 from ..forms import TeacherSignUpForm
 from ..models import User, PlanyNauczycieli, Nauczyciele, PlanyZajecNauczycieli
@@ -23,6 +23,13 @@ class TeacherSignUpView(CreateView):
         user = form.save()
         login(self.request, user)
         return redirect('home')
+
+
+def teacher_time_schedule_redirect(request):
+    nauczyciel = Nauczyciele.objects.all().get(user=request.user)
+    now = datetime.strftime(datetime.now(), "%d-%m-%Y")
+    week_day = datetime.strftime(datetime.now(), "%w")
+    return redirect('teachers:teacher_timetable', teacher=nauczyciel.pk, time=now, week_day=week_day)
 
 
 class TeacherTimeScheduleView(TemplateView):

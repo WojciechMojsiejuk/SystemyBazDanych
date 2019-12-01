@@ -156,8 +156,8 @@ class StudentsListView(ListView):
                 student = Studenci.objects.all().get(user=self.request.user)
                 semestry_studenta = StudentKierunekSemestr.objects.all().filter(id_studenta=student).values('id_semestru')
                 semestry = Semestry.objects.all().filter(id_semestru__in=semestry_studenta)
-                studenci = StudentKierunekSemestr.objects.all().filter(Q(id_semestru__in=semestry))
-                # & ~Q(id_studenta=student)
+                studenci = StudentKierunekSemestr.objects.all().filter(Q(id_semestru__in=semestry) & ~Q(id_studenta=student))
+
                 print(studenci)
                 return studenci
         else:

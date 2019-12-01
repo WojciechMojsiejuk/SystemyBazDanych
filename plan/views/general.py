@@ -1,3 +1,4 @@
+from django.db.models import Q
 from django.shortcuts import redirect, render
 
 from django.views.generic import TemplateView, ListView
@@ -43,6 +44,7 @@ class TeachersListView(ListView):
     def get_queryset(self):
         # We are only interested in teachers who teach in the same faculty in which user is studying or working
         wydziały = []
+        teacher = None
         if self.request.user.is_authenticated:
             if self.request.user.is_student:
                 student = Studenci.objects.all().get(user=self.request.user)
@@ -53,8 +55,10 @@ class TeachersListView(ListView):
             if self.request.user.is_teacher:
                 teacher = Nauczyciele.objects.all().get(user=self.request.user)
                 wydziały = MiejscaZatrudnienia.objects.all().filter(id_nauczyciela=teacher).values('id_wydzialu')
-            nauczyciele = MiejscaZatrudnienia.objects.all().filter(id_wydzialu__in=list(set(wydziały))).values('id_nauczyciela')
-            return Nauczyciele.objects.all().filter(user__in=nauczyciele)
+                print(teacher)
+                print(wydziały)
+            nauczyciele = MiejscaZatrudnienia.objects.all().filter(id_wydzialu__in=wydziały).values('id_nauczyciela')
+            return Nauczyciele.objects.all().filter(Q(user__in=nauczyciele) & ~Q(user=teacher))
         else:
             return None
 
@@ -68,14 +72,13 @@ class RoomsListView(ListView):
             if self.request.user.is_teacher:
                 nauczyciel = Nauczyciele.objects.all().get(user=self.request.user)
                 wydzial_nauczyciela = MiejscaZatrudnienia.objects.all().filter(id_nauczyciela=nauczyciel).values('id_wydzialu')
-                #wydzial = Wydziały.objects.all().filter(id_wydzialu = wydzial_nauczyciela)
-                return Sale.objects.all().filter(id_wydzialu=wydzial_nauczyciela)
-            else:
+                sale = Sale.objects.all().filter(id_wydzialu__in=wydzial_nauczyciela)
+                return sale
+             else:
                 return None
         else:
             return None
 
-    #pass
 
 class RoomsAvailabilityView(TemplateView):
     template_name = 'general/timetable.html'
