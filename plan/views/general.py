@@ -44,6 +44,7 @@ class TeachersListView(ListView):
     def get_queryset(self):
         # We are only interested in teachers who teach in the same faculty in which user is studying or working
         wydziały = []
+        teacher = None
         if self.request.user.is_authenticated:
             if self.request.user.is_student:
                 student = Studenci.objects.all().get(user=self.request.user)
@@ -71,12 +72,11 @@ class RoomsListView(ListView):
             if self.request.user.is_teacher:
                 nauczyciel = Nauczyciele.objects.all().get(user=self.request.user)
                 wydzial_nauczyciela = MiejscaZatrudnienia.objects.all().filter(id_nauczyciela=nauczyciel).values('id_wydzialu')
-                #wydzial = Wydziały.objects.all().filter(id_wydzialu = wydzial_nauczyciela)
-                return Sale.objects.all().filter(id_wydzialu=wydzial_nauczyciela)
+                sale = Sale.objects.all().filter(id_wydzialu__in=wydzial_nauczyciela)
+                return sale
         else:
             return None
 
-    #pass
 
 class RoomsAvailabilityView(TemplateView):
     template_name = 'general/timetable.html'
