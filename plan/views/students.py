@@ -6,7 +6,7 @@ from django.db.models import Q
 from django.shortcuts import redirect
 from django.views.generic import CreateView, ListView, TemplateView
 
-from ..forms import StudentSignUpForm, StudentEnrollInSemesterForm
+from ..forms import StudentSignUpForm
 from ..models import User, Uczelnie, StudentKierunekSemestr, Studenci, Semestry, PlanyStudentow, PlanyZajecStudentow
 from django.utils.decorators import method_decorator
 

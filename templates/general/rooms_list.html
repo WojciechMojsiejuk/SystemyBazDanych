@@ -7,7 +7,7 @@
   <select id="rooms_list" onchange="update()" class="browser-default custom-select col-sm-4">
   <option selected >Choose room you want to book</option>
       {% for room in sale_list%}
-          <option value="{{ room.pk }}">{{ room.id_wydzialu.nazwa_wydzialu }} Sala nr {{ room.nr_sali }}</option>
+          <option value="{{ room.pk }}">{{ room.id_wydzialu.nazwa_wydzialu }} Sala nr {{ room.nr }}</option>
       {% endfor %}
   </select>
   <a id="room_availability" class="btn btn-primary" href="#">Show availability</a>
