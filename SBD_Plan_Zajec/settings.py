@@ -38,7 +38,6 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'plan',
-    'autofixture',
     'localflavor',
     'crispy_forms',
 ]

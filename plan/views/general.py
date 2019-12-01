@@ -1,7 +1,7 @@
 from django.shortcuts import redirect, render
 from django.views.generic import TemplateView, ListView
 
-from plan.models import Nauczyciele, StudentKierunekSemestr, Studenci, Semestry, MiejscaZatrudnienia
+from plan.models import Nauczyciele, StudentKierunekSemestr, Studenci, Semestry, MiejscaZatrudnienia, Sale, Wydziały
 
 
 class SignUpView(TemplateView):
@@ -45,9 +45,16 @@ class TeachersListView(ListView):
 
 class RoomsListView(ListView):
     template_name = 'general/rooms_list.html'
-    pass
+    model = Sale
 
+    def get_queryset(self):
+        if self.request.user.is_authenticated:
+            if self.request.user.is_teacher:
+                nauczyciel = Nauczyciele.objects.all().get(user=self.request.user)
+                wydzial_nauczyciela = MiejscaZatrudnienia.objects.all().filter(id_nauczyciela=nauczyciel).values('id_wydzialu')
+                #wydzial = Wydziały.objects.all().filter(id_wydzialu = wydzial_nauczyciela)
+                return Sale.objects.all().filter(id_wydzialu=wydzial_nauczyciela)
+        else:
+            return None
 
-
-
-
+    #pass

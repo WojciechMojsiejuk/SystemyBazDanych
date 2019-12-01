@@ -21,6 +21,12 @@ urlpatterns = [
                                    path('timetable/<str:teacher>/<str:time>/<str:week_day>', teachers.TeacherTimeScheduleView.as_view(),
                                         name='show_timetable'),
                                ], 'plan'), namespace='teachers')),
+    path('room_availability/', include(([
+                                    path('', general.RoomsListView.as_view(),
+                                        name='room_availability'),
+                                    path('<str:room>/<str:date>/<str:week_day>'), general.RoomsAvailabilityView.as_view(),
+                                ], 'rooms'), namespace='rooms')),
+
 
 
 ]
