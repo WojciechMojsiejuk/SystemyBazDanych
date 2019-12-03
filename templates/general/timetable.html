@@ -3,17 +3,6 @@
 {% block content %}
     <h4>{{ room.id_wydzialu.nazwa_wydzialu }} Room: {{ room.nr_sali }}</h4>
 <p class="lead" >Timetable: {{ week_start |date:"d.m.Y"}} - {{ week_end |date:"d.m.Y"}}</p>
-{#{% for reservation in booked %}#}
-{#    {{ reservation.get_plans.0.id_sali.id_sali.nr_sali }}#}
-{#    {{ reservation.get_plans.0.id_przedmiotu.nazwa_przedmiotu|linebreaks}}#}
-{#    {{ reservation.get_plans.0.plan_studentow.id_planu.id_semestru.id_kierunku.nazwa_kierunku }}#}
-{#    {{ reservation.get_plans.0.plan_studentow.id_planu.id_semestru.nr_semestru }}#}
-{#{{ reservation.get_plans.0.get_typ_zajec_display }}#}
-{#    {{ reservation.get_plans.0.nr_grupy }}#}
-{#    {{ reservation.data_rozpoczecia|date:"H:i" }}#}
-{#    {{ reservation.data_zakonczenia|date:"H:i" }}#}
-{#    {% endfor %}#}
-
 
 <table id="timetable" class="table table-hover table-striped">
   <thead class="thead-dark">
@@ -165,26 +154,26 @@
     </div>
 
     <script>
-        let th_array = document.querySelectorAll("#timetable > thead > tr > th")
-        let th_a_link_array = document.querySelectorAll("#timetable > thead > tr > th > a")
-        let index
-        th_a_link_array[0].href="{% url 'rooms:booked_rooms' room=room.id_sali date=monday week_day=1 %}"
-        th_a_link_array[0].title="{{ monday }}"
-        th_a_link_array[1].href="{% url 'rooms:booked_rooms' room=room.id_sali date=tuesday week_day=2 %}"
-        th_a_link_array[1].title="{{ tuesday }}"
-        th_a_link_array[2].href="{% url 'rooms:booked_rooms' room=room.id_sali date=wednesday week_day=3 %}"
-        th_a_link_array[2].title="{{ wednesday }}"
-        th_a_link_array[3].href="{% url 'rooms:booked_rooms' room=room.id_sali date=thursday week_day=4 %}"
-        th_a_link_array[3].title="{{ thursday }}"
-        th_a_link_array[4].href="{% url 'rooms:booked_rooms' room=room.id_sali date=friday week_day=5 %}"
-        th_a_link_array[4].title="{{ friday }}"
-        th_a_link_array[5].href="{% url 'rooms:booked_rooms' room=room.id_sali date=saturday week_day=6 %}"
-        th_a_link_array[5].title="{{ saturday }}"
-        th_a_link_array[6].href="{% url 'rooms:booked_rooms' room=room.id_sali date=sunday week_day=0 %}"
-        th_a_link_array[6].title="{{ sunday }}"
+        let th_array = document.querySelectorAll("#timetable > thead > tr > th");
+        let th_a_link_array = document.querySelectorAll("#timetable > thead > tr > th > a");
+        let index;
+        th_a_link_array[0].href="{% url 'rooms:booked_rooms' room=room.id_sali date=monday week_day=1 %}";
+        th_a_link_array[0].title="{{ monday }}";
+        th_a_link_array[1].href="{% url 'rooms:booked_rooms' room=room.id_sali date=tuesday week_day=2 %}";
+        th_a_link_array[1].title="{{ tuesday }}";
+        th_a_link_array[2].href="{% url 'rooms:booked_rooms' room=room.id_sali date=wednesday week_day=3 %}";
+        th_a_link_array[2].title="{{ wednesday }}";
+        th_a_link_array[3].href="{% url 'rooms:booked_rooms' room=room.id_sali date=thursday week_day=4 %}";
+        th_a_link_array[3].title="{{ thursday }}";
+        th_a_link_array[4].href="{% url 'rooms:booked_rooms' room=room.id_sali date=friday week_day=5 %}";
+        th_a_link_array[4].title="{{ friday }}";
+        th_a_link_array[5].href="{% url 'rooms:booked_rooms' room=room.id_sali date=saturday week_day=6 %}";
+        th_a_link_array[5].title="{{ saturday }}";
+        th_a_link_array[6].href="{% url 'rooms:booked_rooms' room=room.id_sali date=sunday week_day=0 %}";
+        th_a_link_array[6].title="{{ sunday }}";
         if(0 === parseInt({{ day_of_week }}))
         {
-            th_array[7].setAttribute("class", "bg-primary")
+            th_array[7].setAttribute("class", "bg-primary");
             index=6
         }
         else
@@ -193,12 +182,12 @@
             {
                 if(j === parseInt({{ day_of_week }}))
                 {
-                    th_array[j].setAttribute("class", "bg-primary")
+                    th_array[j].setAttribute("class", "bg-primary");
                     index=j-1
                 }
             }
         }
-        let td_array = document.querySelectorAll("#timetable > tbody > tr > td")
+        let td_array = document.querySelectorAll("#timetable > tbody > tr > td");
         for(let i=0; i<td_array.length; i++)
         {
             if(i%7===index%7)
@@ -206,17 +195,16 @@
                 td_array[i].style.background="rgba(102, 153, 255,0.1)"
             }
         }
-        let body_th_array = document.querySelectorAll("#timetable > tbody > tr > th")
+        let body_th_array = document.querySelectorAll("#timetable > tbody > tr > th");
         {% for reservation in booked %}
-            console.log("{{ reservation.data_rozpoczecia|date:"H:i" }}")
             for(let i=0; i<body_th_array.length; i++)
             {
 
                 if("{{ reservation.data_rozpoczecia|date:"H:i" }}">=body_th_array[i].children[0].innerHTML && "{{ reservation.data_zakonczenia|date:"H:i" }}"<=body_th_array[i].children[1].innerHTML)
                 {
-                    let newPlan = document.createElement("div")
-                    newPlan.innerHTML='<a class="btn btn-sm btn-block active" role="button" aria-pressed="true" style="word-wrap: break-word;" data-toggle="modal" data-target="#detail_{{ forloop.counter }}">{{ reservation.get_plans.0.id_przedmiotu.nazwa_przedmiotu|space_to_new_line|linebreaksbr}}</a>'
-                    newPlan.style.width="100%"
+                    let newPlan = document.createElement("div");
+                    newPlan.innerHTML='<a class="btn btn-sm btn-block active" role="button" aria-pressed="true" style="word-wrap: break-word;" data-toggle="modal" data-target="#detail_{{ forloop.counter }}">{{ reservation.get_plans.0.id_przedmiotu.nazwa_przedmiotu|space_to_new_line|linebreaksbr}}</a>';
+                    newPlan.style.width="100%";
                     {% if reservation.get_plans.0.get_typ_zajec_display == "Wykład" %}
                         newPlan.className += "btn-dark rounded";
                     {% endif %}
@@ -240,217 +228,310 @@
             }
         {% endfor %}
         {% if user.is_teacher %}
-        let add = document.getElementById("add")
+        let add = document.getElementById("add");
 
         for(let i=0; i<td_array.length; i++)
         {
+
             if(td_array[i].innerHTML === "")
             {
 
-                let addNewPlanModal = document.createElement("div")
-                addNewPlanModal.setAttribute("class", "modal fade")
-                addNewPlanModal.setAttribute("id", "add_"+i)
-                addNewPlanModal.setAttribute("tabindex", "-1")
-                addNewPlanModal.setAttribute("role","dialog")
-                addNewPlanModal.setAttribute("aria-labelledby","exampleModalLongTitle")
-                addNewPlanModal.setAttribute("aria-hidden","true")
+                let addNewPlanModal = document.createElement("div");
+                addNewPlanModal.setAttribute("class", "modal fade");
+                addNewPlanModal.setAttribute("id", "add_"+i);
+                addNewPlanModal.setAttribute("tabindex", "-1");
+                addNewPlanModal.setAttribute("role","dialog");
+                addNewPlanModal.setAttribute("aria-labelledby","exampleModalLongTitle");
+                addNewPlanModal.setAttribute("aria-hidden","true");
 
-                let modalDialog = document.createElement("div")
-                modalDialog.setAttribute("class", "modal-dialog")
-                modalDialog.setAttribute("role", "document")
+                let modalDialog = document.createElement("div");
+                modalDialog.setAttribute("class", "modal-dialog");
+                modalDialog.setAttribute("role", "document");
 
-                let modalContent = document.createElement("div")
-                 modalContent.setAttribute("class", "modal-content")
+                let modalContent = document.createElement("div");
+                 modalContent.setAttribute("class", "modal-content");
 
-                let modalHeader = document.createElement("div")
-                modalHeader.setAttribute("class", "modal-header")
+                let modalHeader = document.createElement("div");
+                modalHeader.setAttribute("class", "modal-header");
 
-                let modalTitle = document.createElement("h5")
-                let modalTitleText = document.createTextNode("Create new reservation")
-                modalTitle.appendChild(modalTitleText)
-                modalTitle.setAttribute("class","modal-title")
-                modalTitle.setAttribute("id","exampleModalLongTitle")
+                let modalTitle = document.createElement("h5");
+                let modalTitleText = document.createTextNode("Create new reservation");
+                modalTitle.appendChild(modalTitleText);
+                modalTitle.setAttribute("class","modal-title");
+                modalTitle.setAttribute("id","exampleModalLongTitle");
 
-                let modalHeaderButton = document.createElement("BUTTON")
-                modalHeaderButton.setAttribute("type", "button")
-                modalHeaderButton.setAttribute("class", "close")
-                modalHeaderButton.setAttribute("data-dismiss", "modal")
-                modalHeaderButton.setAttribute("aria-label", "Close")
+                let modalHeaderButton = document.createElement("BUTTON");
+                modalHeaderButton.setAttribute("type", "button");
+                modalHeaderButton.setAttribute("class", "close");
+                modalHeaderButton.setAttribute("data-dismiss", "modal");
+                modalHeaderButton.setAttribute("aria-label", "Close");
 
-                let modalHeaderButtonSpan = document.createElement('span')
-                modalHeaderButtonSpan.setAttribute("aria-hidden", "true")
-                modalHeaderButtonSpan.innerHTML="&times;"
+                let modalHeaderButtonSpan = document.createElement('span');
+                modalHeaderButtonSpan.setAttribute("aria-hidden", "true");
+                modalHeaderButtonSpan.innerHTML="&times;";
 
-                modalHeaderButton.appendChild(modalHeaderButtonSpan)
-                modalHeader.appendChild(modalTitle)
-                modalHeader.appendChild(modalHeaderButton)
-                modalContent.appendChild(modalHeader)
-                modalDialog.appendChild(modalContent)
-                addNewPlanModal.appendChild(modalDialog)
+                modalHeaderButton.appendChild(modalHeaderButtonSpan);
+                modalHeader.appendChild(modalTitle);
+                modalHeader.appendChild(modalHeaderButton);
+                modalContent.appendChild(modalHeader);
+                modalDialog.appendChild(modalContent);
+                addNewPlanModal.appendChild(modalDialog);
 
-                let modalBody = document.createElement('div')
-                modalBody.setAttribute("class","modal-body")
+                let modalBody = document.createElement('div');
+                modalBody.setAttribute("class","modal-body");
 
-                let modalBodyTeachersPlanParagraph = document.createElement('p')
-                modalBodyTeachersPlanParagraph.innerHTML="Choose your plan:"
+                let modalBodyTeachersPlanParagraph = document.createElement('p');
+                modalBodyTeachersPlanParagraph.innerHTML="Choose your plan:";
 
-                let modalBodyTeachersPlanSelectList = document.createElement("select")
+                let modalBodyTeachersPlanSelectList = document.createElement("select");
+                modalBodyTeachersPlanSelectList.setAttribute("id","teacher_plan_"+i);
+                modalBodyTeachersPlanSelectList.setAttribute("onchange","updateTeacherPlan("+i+",this.id)");
 
-                let modalBodyTeachersPlanSelectListOption
+                let modalBodyTeachersPlanSelectListOption;
                 {% for plan in teacher_plans %}
-                    modalBodyTeachersPlanSelectListOption = document.createElement("option")
-                    modalBodyTeachersPlanSelectListOption.value="{{ plan.id_planu }}"
-                    modalBodyTeachersPlanSelectListOption.text = "{{ plan.id_semestru.id_kierunku.nazwa_kierunku }} {{ plan.id_semestru.nr_semestru }}"
-                    modalBodyTeachersPlanSelectList.appendChild(modalBodyTeachersPlanSelectListOption)
-                    modalBodyTeachersPlanSelectListOption=null
+                    modalBodyTeachersPlanSelectListOption = document.createElement("option");
+                    modalBodyTeachersPlanSelectListOption.value="{{ plan.id_planu }}";
+                    modalBodyTeachersPlanSelectListOption.text = "{{ plan.id_semestru.id_kierunku.nazwa_kierunku }} {{ plan.id_semestru.nr_semestru }}";
+                    modalBodyTeachersPlanSelectList.appendChild(modalBodyTeachersPlanSelectListOption);
+                    modalBodyTeachersPlanSelectListOption=null;
                 {% endfor %}
 
 
-                let modalBodyStudentsPlanParagraph = document.createElement('p')
-                modalBodyStudentsPlanParagraph.innerHTML="<br>Choose matching students plan:"
+                let modalBodyStudentsPlanParagraph = document.createElement('p');
+                modalBodyStudentsPlanParagraph.innerHTML="<br>Choose matching students plan:";
+                let modalBodyStudentsPlanSelectList = document.createElement("select");
+                modalBodyStudentsPlanSelectList.setAttribute("id", "students_plan"+i);
+                modalBodyStudentsPlanParagraph.setAttribute("onchange","updateStudentsPlan("+i+",this.id)");
 
-                let modalBodyStudentsPlanSelectList = document.createElement("select")
-
-                let modalBodyStudentsPlanSelectListOption
+                let modalBodyStudentsPlanSelectListOption;
                 {% for plan in students_plans %}
-                    modalBodyStudentsPlanSelectListOption = document.createElement("option")
-                    modalBodyStudentsPlanSelectListOption.value="{{ plan.id_planu }}"
-                    modalBodyStudentsPlanSelectListOption.text = "{{ plan.id_semestru.id_kierunku.nazwa_kierunku }} {{ plan.id_semestru.nr_semestru }}"
-                    modalBodyStudentsPlanSelectList.appendChild(modalBodyStudentsPlanSelectListOption)
-                    modalBodyStudentsPlanSelectListOption=null
+                    modalBodyStudentsPlanSelectListOption = document.createElement("option");
+                    modalBodyStudentsPlanSelectListOption.value="{{ plan.id_planu }}";
+                    modalBodyStudentsPlanSelectListOption.text = "{{ plan.id_semestru.id_kierunku.nazwa_kierunku }} {{ plan.id_semestru.nr_semestru }}";
+                    modalBodyStudentsPlanSelectList.appendChild(modalBodyStudentsPlanSelectListOption);
+                    modalBodyStudentsPlanSelectListOption=null;
                 {% endfor %}
 
-                let modalBodyTeacherSubjectsParagraph = document.createElement('p')
-                modalBodyTeacherSubjectsParagraph.innerHTML="<br> Choose subject:"
+                let modalBodyTeacherSubjectsParagraph = document.createElement('p');
+                modalBodyTeacherSubjectsParagraph.innerHTML="<br> Choose subject:";
 
-                let modalBodyTeacherSubjectsSelectList = document.createElement("select")
-                let modalBodyTeacherSubjectsSelectListOption
+                let modalBodyTeacherSubjectsSelectList = document.createElement("select");
+                modalBodyTeacherSubjectsSelectList.setAttribute("id", "subject_"+i);
+                modalBodyTeacherSubjectsSelectList.setAttribute("onchange","updateSubject("+i+",this.id)");
+                let modalBodyTeacherSubjectsSelectListOption;
                 {% for subject in teacher_subjects %}
 
-                    modalBodyTeacherSubjectsSelectListOption = document.createElement("option")
-                    modalBodyTeacherSubjectsSelectListOption.value="{{ subject.id_przedmiotu }}"
-                    modalBodyTeacherSubjectsSelectListOption.text = "{{ subject.nazwa_przedmiotu }}"
-                    modalBodyTeacherSubjectsSelectList.appendChild(modalBodyTeacherSubjectsSelectListOption)
-                    modalBodyTeacherSubjectsSelectListOption=null
+                    modalBodyTeacherSubjectsSelectListOption = document.createElement("option");
+                    modalBodyTeacherSubjectsSelectListOption.value="{{ subject.id_przedmiotu }}";
+                    modalBodyTeacherSubjectsSelectListOption.text = "{{ subject.nazwa_przedmiotu }}";
+                    modalBodyTeacherSubjectsSelectList.appendChild(modalBodyTeacherSubjectsSelectListOption);
+                    modalBodyTeacherSubjectsSelectListOption=null;
                 {% endfor %}
 
-                let modalBodySubjectTypeParagraph = document.createElement('p')
-                modalBodySubjectTypeParagraph.innerHTML="<br> Choose subject's type:"
+                let modalBodySubjectTypeParagraph = document.createElement('p');
+                modalBodySubjectTypeParagraph.innerHTML="<br> Choose subject's type:";
 
-                let modalBodySubjectTypeSelectList = document.createElement("select")
-                let modalBodySubjectTypeSelectListOption = new Array(6)
+                let modalBodySubjectTypeSelectList = document.createElement("select");
+                modalBodySubjectTypeSelectList.setAttribute("id", "subject_type_"+i);
+                modalBodySubjectTypeSelectList.setAttribute("onchange","updateSubjectType("+i+",this.id)");
 
+                let modalBodySubjectTypeSelectListOption = new Array(6);
+                modalBodySubjectTypeSelectListOption[0] = document.createElement("option");
+                modalBodySubjectTypeSelectListOption[0].value="W";
+                modalBodySubjectTypeSelectListOption[0].text = "Wykład";
+                modalBodySubjectTypeSelectList.appendChild(modalBodySubjectTypeSelectListOption[0]);
 
-                modalBodySubjectTypeSelectListOption[0] = document.createElement("option")
-                modalBodySubjectTypeSelectListOption[0].value="W"
-                modalBodySubjectTypeSelectListOption[0].text = "Wykład"
-                modalBodySubjectTypeSelectList.appendChild(modalBodySubjectTypeSelectListOption[0])
+                modalBodySubjectTypeSelectListOption[1] = document.createElement("option");
+                modalBodySubjectTypeSelectListOption[1].value="C";
+                modalBodySubjectTypeSelectListOption[1].text = "Ćwiczenia";
+                modalBodySubjectTypeSelectList.appendChild(modalBodySubjectTypeSelectListOption[1]);
 
-                modalBodySubjectTypeSelectListOption[1] = document.createElement("option")
-                modalBodySubjectTypeSelectListOption[1].value="C"
-                modalBodySubjectTypeSelectListOption[1].text = "Ćwiczenia"
-                modalBodySubjectTypeSelectList.appendChild(modalBodySubjectTypeSelectListOption[1])
+                modalBodySubjectTypeSelectListOption[2] = document.createElement("option");
+                modalBodySubjectTypeSelectListOption[2].value="PS";
+                modalBodySubjectTypeSelectListOption[2].text = "Pracownia Specjalistyczna";
+                modalBodySubjectTypeSelectList.appendChild(modalBodySubjectTypeSelectListOption[2]);
 
-                modalBodySubjectTypeSelectListOption[2] = document.createElement("option")
-                modalBodySubjectTypeSelectListOption[2].value="PS"
-                modalBodySubjectTypeSelectListOption[2].text = "Pracownia Specjalistyczna"
-                modalBodySubjectTypeSelectList.appendChild(modalBodySubjectTypeSelectListOption[2])
+                modalBodySubjectTypeSelectListOption[3] = document.createElement("option");
+                modalBodySubjectTypeSelectListOption[3].value="L";
+                modalBodySubjectTypeSelectListOption[3].text = "Laboratiorium";
+                modalBodySubjectTypeSelectList.appendChild(modalBodySubjectTypeSelectListOption[3]);
+                modalBodySubjectTypeSelectListOption[4] = document.createElement("option");
+                modalBodySubjectTypeSelectListOption[4].value="S";
+                modalBodySubjectTypeSelectListOption[4].text = "Seminarium";
+                modalBodySubjectTypeSelectList.appendChild(modalBodySubjectTypeSelectListOption[4]);
 
-                modalBodySubjectTypeSelectListOption[3] = document.createElement("option")
-                modalBodySubjectTypeSelectListOption[3].value="L"
-                modalBodySubjectTypeSelectListOption[3].text = "Laboratiorium"
-                modalBodySubjectTypeSelectList.appendChild(modalBodySubjectTypeSelectListOption[3])
-
-                modalBodySubjectTypeSelectListOption[4] = document.createElement("option")
-                modalBodySubjectTypeSelectListOption[4].value="S"
-                modalBodySubjectTypeSelectListOption[4].text = "Seminarium"
-                modalBodySubjectTypeSelectList.appendChild(modalBodySubjectTypeSelectListOption[4])
-
-                modalBodySubjectTypeSelectListOption[5] = document.createElement("option")
-                modalBodySubjectTypeSelectListOption[5].value="K"
-                modalBodySubjectTypeSelectListOption[5].text = "Konsultacje"
-                modalBodySubjectTypeSelectList.appendChild(modalBodySubjectTypeSelectListOption[5])
-                modalBodySubjectTypeSelectListOption=null
-
-                modalBody.appendChild(modalBodyTeachersPlanParagraph)
-                modalBody.appendChild(modalBodyTeachersPlanSelectList)
-
-                modalBody.appendChild(modalBodyStudentsPlanParagraph)
-                modalBody.appendChild(modalBodyStudentsPlanSelectList)
-                modalBody.appendChild(modalBodyTeacherSubjectsParagraph)
-                modalBody.appendChild(modalBodyTeacherSubjectsSelectList)
-                modalBody.appendChild(modalBodySubjectTypeParagraph)
-                modalBody.appendChild(modalBodySubjectTypeSelectList)
+                modalBodySubjectTypeSelectListOption[5] = document.createElement("option");
+                modalBodySubjectTypeSelectListOption[5].value="K";
+                modalBodySubjectTypeSelectListOption[5].text = "Konsultacje";
+                modalBodySubjectTypeSelectList.appendChild(modalBodySubjectTypeSelectListOption[5]);
+                modalBodySubjectTypeSelectListOption=null;
 
 
+                let modalBodyGroupNumberParagraph = document.createElement('p');
+                modalBodyGroupNumberParagraph.innerHTML="<br> Choose students group number:";
 
-                let modalFooter = document.createElement('div')
-                modalFooter.setAttribute("class","modal-footer")
+                let modalBodyGroupNumber = document.createElement("input");
+                modalBodyGroupNumber.setAttribute("type","number");
+                modalBodyGroupNumber.setAttribute("min","1");
+                modalBodyGroupNumber.setAttribute("id", "group_nr_"+i);
+                modalBodyGroupNumber.setAttribute("value", "1");
+                modalBodyGroupNumber.setAttribute("oninput","updateGroupName("+i+",this.id)");
 
-                let modalFooterCloseButton = document.createElement("BUTTON")
-                modalFooterCloseButton.setAttribute("type","button")
-                modalFooterCloseButton.setAttribute("class","btn btn-secondary")
-                modalFooterCloseButton.setAttribute("data-dismiss","modal")
-                modalFooterCloseButton.innerText="Close"
 
-                let modalFooterCreateButton = document.createElement("BUTTON")
-                modalFooterCreateButton.setAttribute("type","button")
-                modalFooterCreateButton.setAttribute("class","btn btn-primary")
 
-                let tr = td_array[i].parentElement
-                let tr_index = Array.from(tr.parentNode.children).indexOf(tr)
-                let tr_date=""
+                modalBody.appendChild(modalBodyTeachersPlanParagraph);
+                modalBody.appendChild(modalBodyTeachersPlanSelectList);
+                modalBody.appendChild(modalBodyStudentsPlanParagraph);
+                modalBody.appendChild(modalBodyStudentsPlanSelectList);
+                modalBody.appendChild(modalBodyTeacherSubjectsParagraph);
+                modalBody.appendChild(modalBodyTeacherSubjectsSelectList);
+                modalBody.appendChild(modalBodySubjectTypeParagraph);
+                modalBody.appendChild(modalBodySubjectTypeSelectList);
+                modalBody.appendChild(modalBodyGroupNumberParagraph);
+                modalBody.appendChild(modalBodyGroupNumber);
+
+
+
+                let modalFooter = document.createElement('div');
+                modalFooter.setAttribute("class","modal-footer");
+
+                let modalFooterCloseButton = document.createElement("BUTTON");
+                modalFooterCloseButton.setAttribute("type","button");
+                modalFooterCloseButton.setAttribute("class","btn btn-secondary");
+                modalFooterCloseButton.setAttribute("data-dismiss","modal");
+                modalFooterCloseButton.innerText="Close";
+
+                let modalFooterCreateButton = document.createElement("a");
+                modalFooterCreateButton.setAttribute("role","button");
+                modalFooterCreateButton.setAttribute("class","btn btn-primary active");
+                modalFooterCreateButton.setAttribute("id","create_button_"+i);
+
+                let tr = td_array[i].parentElement;
+                let tr_index = i%7;
+                let tr_date="";
                 switch(tr_index)
                 {
                     case 0:
-                        tr_date="{{ monday }}"
+                        tr_date="{{ monday }}";
                         break;
                     case 1:
-                        tr_date="{{ tuesday }}"
+                        tr_date="{{ tuesday }}";
                         break;
                     case 2:
-                        tr_date="{{ wednesday }}"
+                        tr_date="{{ wednesday }}";
                         break;
                     case 3:
-                        tr_date="{{ thursday }}"
+                        tr_date="{{ thursday }}";
                         break;
                     case 4:
-                        tr_date="{{ friday }}"
+                        tr_date="{{ friday }}";
                         break;
                     case 5:
-                        tr_date="{{ saturday }}"
+                        tr_date="{{ saturday }}";
                         break;
                     case 6:
-                        tr_date="{{ sunday }}"
+                        tr_date="{{ sunday }}";
                         break;
                 }
-                let wd = (tr_index+1)%7
-                modalFooterCreateButton.setAttribute("href", "{% url 'rooms:add_reservation' room=room.id_sali date="tr" week_day="wd"%}".replace(/tr/,tr_date).replace(/wd/,wd))
-                modalFooterCreateButton.innerText="Create"
 
 
-                modalFooter.appendChild(modalFooterCloseButton)
-                modalFooter.appendChild(modalFooterCreateButton)
+                let tr_time_start = td_array[i].parentElement.children[0].children[0].innerHTML;
+                let tr_time_end = td_array[i].parentElement.children[0].children[1].innerHTML;
 
-                modalContent.appendChild(modalBody)
-                modalContent.appendChild(modalFooter)
+                let wd = (i+1)%7;
+                let teacher_plan = modalBodyTeachersPlanSelectList.options[modalBodyTeachersPlanSelectList.selectedIndex].value;
+                let students_plan = modalBodyStudentsPlanSelectList.options[modalBodyStudentsPlanSelectList.selectedIndex].value;
+                let subject = modalBodyTeacherSubjectsSelectList.options[modalBodyTeacherSubjectsSelectList.selectedIndex].value;
+                let selected_room = "{{ room.id_sali }}";
+                let subject_type = modalBodySubjectTypeSelectList.options[modalBodySubjectTypeSelectList.selectedIndex].value;
+                let group_nr = modalBodyGroupNumber.value;
+                modalFooterCreateButton.setAttribute("href", "{% url 'rooms:add_reservation' room="rm" date="tr" week_day="wd" frm="frm" to="to" teacher_plan="t8x6_plan" students_plan="s6y7_plan" subject="subj5z4ect" subject_type="subj3q4ect@_s6Dtype" group_nr="gR@ouP1_2nr"%}".replace(/gR@ouP1_2nr/,group_nr).replace(/subj3q4ect@_s6Dtype/,subject_type).replace(/subj5z4ect/,subject).replace(/rm/,selected_room).replace(/s6y7_plan/,students_plan).replace(/t8x6_plan/,teacher_plan).replace(/to/,tr_time_end).replace(/frm/,tr_time_start).replace(/wd/,wd).replace(/tr/,tr_date));
+                modalFooterCreateButton.innerText="Create";
 
-                add.appendChild(addNewPlanModal)
+
+                modalFooter.appendChild(modalFooterCloseButton);
+                modalFooter.appendChild(modalFooterCreateButton);
+
+                modalContent.appendChild(modalBody);
+                modalContent.appendChild(modalFooter);
+
+                add.appendChild(addNewPlanModal);
 
 
 
-                let addNewPlan = document.createElement("div")
-                addNewPlan.innerHTML='<a class="btn btn-sm btn-block active  align-middle" role="button" aria-pressed="true" style="word-wrap: break-word;" data-toggle="modal" data-target="#add_'+i+'"> + </a>'
-                addNewPlan.style.background="rgba(0,0,255,0.04)"
-                addNewPlan.style.width="100%"
-                addNewPlan.style.padding="auto"
-                addNewPlan.setAttribute("class","text-center rounded")
-                td_array[i].setAttribute("class","align-middle")
+                let addNewPlan = document.createElement("div");
+                addNewPlan.innerHTML='<a class="btn btn-sm btn-block active  align-middle" role="button" aria-pressed="true" style="word-wrap: break-word;" data-toggle="modal" data-target="#add_'+i+'"> + </a>';
+                addNewPlan.style.background="rgba(0,0,255,0.04)";
+                addNewPlan.style.width="100%";
+                addNewPlan.style.padding="auto";
+                addNewPlan.setAttribute("class","text-center rounded");
+                td_array[i].setAttribute("class","align-middle");
                 td_array[i].appendChild(addNewPlan)
+
             }
+
+
         }
 
         {% endif %}
+
+    function updateTeacherPlan(id, select_id) {
+        let button = document.getElementById("create_button_"+id);
+        let select = document.getElementById(select_id);
+        console.log(select);
+        let selected_value = select.options[select.selectedIndex].value;
+        console.log(selected_value)
+        let regex = new RegExp('teacher_plan.*students_plan');
+        button.href=button.href.replace(regex,'teacher_plan/'+selected_value+'/students_plan');
+        console.log(button)
+    }
+
+    function updateStudentsPlan(id, select_id) {
+        let button = document.getElementById("create_button_"+id);
+        let select = document.getElementById(select_id);
+        console.log(select);
+        let selected_value = select.options[select.selectedIndex].value;
+        console.log(selected_value)
+        let regex = new RegExp('students_plan.*subject');
+        button.href=button.href.replace(regex,'students_plan/'+selected_value+'/subject');
+        console.log(button)
+    }
+
+    function updateSubject(id, select_id) {
+        let button = document.getElementById("create_button_"+id);
+        let select = document.getElementById(select_id);
+        let selected_value = select.options[select.selectedIndex].value;
+        let new_value = 'subject/'+selected_value+'/type';
+        let regex = new RegExp('subject/*./type');
+        let old_href = button.href;
+        let new_href = old_href.replace(regex,new_value);
+        button.setAttribute('href',new_href);
+        console.log(button.href)
+    }
+
+    function updateSubjectType(id, select_id) {
+        let button = document.getElementById("create_button_"+id);
+        let select = document.getElementById(select_id);
+        let selected_value = ''+select.options[select.selectedIndex].value;
+        let new_value = 'type/'+selected_value+"/group_nr";
+        let regex = new RegExp('type.*group_nr');
+        let old_href = button.href;
+        let new_href = old_href.replace(regex, new_value);
+        button.setAttribute("href", new_href);
+        console.log(button)
+    }
+
+    function updateGroupName(id, select_id)
+    {
+        let button = document.getElementById("create_button_"+id);
+        let select = document.getElementById(select_id);
+        let selected_value = ''+select.value;
+        let new_value = 'group_nr/'+selected_value+"/reservation";
+        let regex = new RegExp('group_nr.*reservation');
+        let old_href = button.href;
+        let new_href = old_href.replace(regex, new_value);
+        button.setAttribute("href", new_href);
+    }
     </script>
 
 

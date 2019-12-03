@@ -22,7 +22,6 @@
          if(Number.isInteger(parseInt(students_semester)))
          {
              button.href="{% url 'students:show_timetable' semester="students_semester" time=today week_day=today_day_of_week %}".replace(/students_semester/,students_semester)
-
          }
          else
          {

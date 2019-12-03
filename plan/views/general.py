@@ -1,5 +1,7 @@
+from MySQLdb._exceptions import IntegrityError
+from django.db import transaction
 from django.db.models import Q
-from django.shortcuts import render
+from django.shortcuts import render, redirect
 from django.views import View
 
 from django.views.generic import TemplateView, ListView, CreateView
@@ -8,7 +10,8 @@ from django.utils.decorators import method_decorator
 from datetime import datetime, timedelta
 
 from plan.models import Nauczyciele, StudentKierunekSemestr, Studenci, Semestry, MiejscaZatrudnienia, Sale, Wydziały, \
-    ZajetoscSal, PlanyNauczycieli, PlanyZajecStudentow, PrzedmiotyNauczycieli, Przedmioty, PlanyStudentow
+    ZajetoscSal, PlanyNauczycieli, PlanyZajecStudentow, PrzedmiotyNauczycieli, Przedmioty, PlanyStudentow, \
+    PlanyZajecNauczycieli
 
 
 class SignUpView(TemplateView):
@@ -51,7 +54,8 @@ class TeachersListView(ListView):
         if self.request.user.is_authenticated:
             if self.request.user.is_student:
                 student = Studenci.objects.all().get(user=self.request.user)
-                semestry_studenta = StudentKierunekSemestr.objects.all().filter(id_studenta=student).values('id_semestru')
+                semestry_studenta = StudentKierunekSemestr.objects.all().filter(id_studenta=student).values(
+                    'id_semestru')
                 semestry = Semestry.objects.all().filter(id_semestru__in=semestry_studenta)
                 for semestr in semestry:
                     wydziały.append(semestr.get_kierunek().get_wydzial())
@@ -77,7 +81,8 @@ class RoomsListView(ListView):
                 wydziały = MiejscaZatrudnienia.objects.all().filter(id_nauczyciela=nauczyciel).values('id_wydzialu')
             elif self.request.user.is_student:
                 student = Studenci.objects.all().get(user=self.request.user)
-                semestry_studenta = StudentKierunekSemestr.objects.all().filter(id_studenta=student).values("id_semestru")
+                semestry_studenta = StudentKierunekSemestr.objects.all().filter(id_studenta=student).values(
+                    "id_semestru")
                 semestry = Semestry.objects.all().filter(id_semestru__in=semestry_studenta)
                 for semestr in semestry:
                     wydziały.append(semestr.get_kierunek().get_wydzial())
@@ -107,7 +112,7 @@ class RoomsAvailabilityView(TemplateView):
         dt = datetime.strptime(self.date, "%d-%m-%Y")
         start = dt - timedelta(days=dt.weekday())
         end = start + timedelta(days=6)
-        week_dmy = [datetime.strftime(start + timedelta(days=x), "%d-%m-%Y") for x in range(0, (end - start).days+1)]
+        week_dmy = [datetime.strftime(start + timedelta(days=x), "%d-%m-%Y") for x in range(0, (end - start).days + 1)]
         next_week = dt + timedelta(days=7)
         next_week = datetime.strftime(next_week, "%d-%m-%Y")
         last_week = dt - timedelta(days=7)
@@ -124,7 +129,8 @@ class RoomsAvailabilityView(TemplateView):
             teacher_plans = PlanyNauczycieli.objects.all().filter(id_nauczyciela=teacher)
             students_plan_list = PlanyZajecStudentow.objects.all().filter(id_nauczyciela=teacher).values("id_planu")
             students_plans = list(set(PlanyStudentow.objects.all().filter(id_planu__in=students_plan_list)))
-            teacher_subjects_list = PrzedmiotyNauczycieli.objects.all().filter(id_nauczyciela=teacher).values("id_przedmiotu")
+            teacher_subjects_list = PrzedmiotyNauczycieli.objects.all().filter(id_nauczyciela=teacher).values(
+                "id_przedmiotu")
             teacher_subjects = Przedmioty.objects.all().filter(id_przedmiotu__in=teacher_subjects_list)
         print(students_plans)
         context['students_plans'] = students_plans
@@ -147,7 +153,37 @@ class RoomsAvailabilityView(TemplateView):
         context['booked'] = booked
         return context
 
+@transaction.atomic
+def create_reservation(request, room, date, week_day, frm, to, teacher_plan, students_plan, subject, subject_type,
+                       group_nr):
+    try:
+        selected_room = Sale.objects.all().get(id_sali=room)
+        selected_date = date + "_" + frm
+        start_date = datetime.strptime(selected_date, "%d-%m-%Y_%H:%M")
+        end_date = datetime.strptime(date + "_" + to, "%d-%m-%Y_%H:%M")
+        reservation = ZajetoscSal(id_sali=selected_room, data_rozpoczecia=start_date, data_zakonczenia=end_date)
+        reservation.save()
+        plan_teacher_id = PlanyNauczycieli.objects.all().get(id_planu=teacher_plan)
+        s_plan = PlanyStudentow.objects.get(id_planu=students_plan)
+        teacher = Nauczyciele.objects.all().get(user=plan_teacher_id.id_nauczyciela)
+        sub_res = Przedmioty.objects.all().get(id_przedmiotu=subject)
+        s_plan_reserv = PlanyZajecStudentow(id_planu=s_plan,
+                                            id_nauczyciela=teacher,
+                                            typ_zajec=subject_type,
+                                            id_przedmiotu=sub_res,
+                                            id_sali=reservation,
+                                            nr_grupy=group_nr)
+        s_plan_reserv.save()
+        t_plan_reserv = PlanyZajecNauczycieli(id_planu=plan_teacher_id,
+                                              plan_studentow=s_plan_reserv,
+                                              id_przedmiotu=sub_res,
+                                              typ_zajec=subject_type,
+                                              id_sali=reservation,
+                                              nr_grupy=group_nr)
 
-class ReservationCreateView(View):
-    pass
+        t_plan_reserv.save()
+    except IntegrityError as ie:
+        message = ie.message
+        return message
 
+    return redirect('rooms:booked_rooms', room=room, date=date, week_day=week_day)

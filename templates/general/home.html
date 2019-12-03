@@ -26,7 +26,7 @@
         {% endif %}
     </p>
     <p class="lead">
-        You can check rooms' availability {% if user.is_teacher %} and manage reservations {% endif %}<a href=#">here</a>.
+        You can check rooms' availability {% if user.is_teacher %} and manage reservations {% endif %}<a href="{% url "rooms:room_availability" %}">here</a>.
     </p>
     <p class="lead">
         You can check your

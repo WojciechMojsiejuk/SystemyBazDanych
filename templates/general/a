@@ -1,0 +1,33 @@
+ function updateTeachersPlan(id, button_id, room, tr, wd, frm, to, teacher_plan)
+                {
+                    let teacher_select= document.getElementById(id)
+                    console.log(teacher_select)
+                    teacher_plan = teacher_select.options[teacher_select.selectedIndex].value
+                    {#update(button_id, room, tr, wd, frm, to, teacher_plan)#}
+                }
+
+                function update(button_id, room, tr, wd, frm, to, teacher_plan)
+                {
+                    let button =  document.getElementById(button_id)
+                    console.log(button)
+                    modalFooterCreateButton.setAttribute("href", "{% url 'rooms:add_reservation' room=room.id_sali date="tr" week_day="wd" frm="frm" to="to" teacher_plan="t_p" %}".replace(/tr/,tr_date).replace(/wd/,wd).replace(/frm/,tr_time_start).replace(/to/,tr_time_end).replace(/t_p/,teacher_plan))
+                }
+
+
+                function updateTeachersPlan(id, button_id, room, tr, wd, frm, to, teacher_plan)
+                {
+                    let teacher_select= document.getElementById(id)
+                    console.log(teacher_select)
+                    teacher_plan = teacher_select.options[teacher_select.selectedIndex].value
+                    update(button_id, room, tr, wd, frm, to, teacher_plan)
+                }
+
+                function update(button_id, room, tr, wd, frm, to, teacher_plan)
+                {
+                    let button =  document.getElementById(button_id)
+                    console.log("Button"+ button)
+                    {#modalFooterCreateButton.setAttribute("href", "{% url 'rooms:add_reservation' room=room.id_sali date="tr" week_day="wd" frm="frm" to="to" teacher_plan="t_p" %}".replace(/tr/,tr_date).replace(/wd/,wd).replace(/frm/,tr_time_start).replace(/to/,tr_time_end).replace(/t_p/,teacher_plan))#}
+                }
+
+                modalBodyTeachersPlanSelectList.setAttribute("on_change","updateTeachersPlan(this.id,modalFooterCreateButton.id, selected_room, tr_date, wd, tr_time_start, tr_time_end, teacher_plan)")
+            }
