@@ -8,6 +8,7 @@ from django.views.generic import TemplateView, ListView, CreateView
 from django.contrib.auth.decorators import login_required
 from django.utils.decorators import method_decorator
 from datetime import datetime, timedelta
+from django.http import HttpResponse
 
 from plan.models import Nauczyciele, StudentKierunekSemestr, Studenci, Semestry, MiejscaZatrudnienia, Sale, Wydziały, \
     ZajetoscSal, PlanyNauczycieli, PlanyZajecStudentow, PrzedmiotyNauczycieli, Przedmioty, PlanyStudentow, \
@@ -128,10 +129,14 @@ class RoomsAvailabilityView(TemplateView):
             teacher = Nauczyciele.objects.all().get(user=self.request.user)
             teacher_plans = PlanyNauczycieli.objects.all().filter(id_nauczyciela=teacher)
             students_plan_list = PlanyZajecStudentow.objects.all().filter(id_nauczyciela=teacher).values("id_planu")
-            students_plans = list(set(PlanyStudentow.objects.all().filter(id_planu__in=students_plan_list)))
+            if students_plan_list is not None:
+                students_plans = list(set(PlanyStudentow.objects.all().filter(id_planu__in=students_plan_list)))
+            else:
+                teacher_plans = list(set(PlanyStudentow.objects.all()))
             teacher_subjects_list = PrzedmiotyNauczycieli.objects.all().filter(id_nauczyciela=teacher).values(
                 "id_przedmiotu")
             teacher_subjects = Przedmioty.objects.all().filter(id_przedmiotu__in=teacher_subjects_list)
+        print("SP")
         print(students_plans)
         context['students_plans'] = students_plans
         context['teacher_plans'] = teacher_plans
@@ -153,6 +158,7 @@ class RoomsAvailabilityView(TemplateView):
         context['booked'] = booked
         return context
 
+
 @transaction.atomic
 def create_reservation(request, room, date, week_day, frm, to, teacher_plan, students_plan, subject, subject_type,
                        group_nr):
@@ -169,7 +175,7 @@ def create_reservation(request, room, date, week_day, frm, to, teacher_plan, stu
             message = dne.message
             return message
         try:
-            s_plan = PlanyStudentow.objects.get(id_planu=students_plan)
+            s_plans = PlanyStudentow.objects.all().filter(id_planu=students_plan)
         except PlanyStudentow.DoesNotExist as dne:
             message = dne.message
             return message
@@ -183,25 +189,40 @@ def create_reservation(request, room, date, week_day, frm, to, teacher_plan, stu
         except Przedmioty.DoesNotExist as dne:
             message = dne.message
             return message
-        subject_list = PrzedmiotyWSemestrze.objects.all().filter(id_semestru=s_plan.id_semestru).values('id_przedmiotu')
+        try:
+            sem_subject_list = PrzedmiotyWSemestrze.objects.all().filter(id_semestru=s_plans[0].id_semestru).values('id_przedmiotu')
+        except PrzedmiotyWSemestrze.DoesNotExist as dne:
+            message = dne.message
+            return message
+        try:
+            subject_list = Przedmioty.objects.all().filter(id_przedmiotu__in=sem_subject_list)
+        except Przedmioty.DoesNotExist as dne:
+            message = dne.message
+            return message
+        print(s_plans)
+        print("SUB LIST")
+        print(subject_list)
+        print("SUB")
+        print(sub_res)
         if sub_res in subject_list:
-            s_plan_reserv = PlanyZajecStudentow(id_planu=s_plan,
-                                                id_nauczyciela=teacher,
-                                                typ_zajec=subject_type,
-                                                id_przedmiotu=sub_res,
-                                                id_sali=reservation,
-                                                nr_grupy=group_nr)
-            s_plan_reserv.save()
-            t_plan_reserv = PlanyZajecNauczycieli(id_planu=plan_teacher_id,
-                                                  plan_studentow=s_plan_reserv,
-                                                  id_przedmiotu=sub_res,
-                                                  typ_zajec=subject_type,
-                                                  id_sali=reservation,
-                                                  nr_grupy=group_nr)
+            for s_plan in s_plans:
+                s_plan_reserv = PlanyZajecStudentow(id_planu=s_plan,
+                                                    id_nauczyciela=teacher,
+                                                    typ_zajec=subject_type,
+                                                    id_przedmiotu=sub_res,
+                                                    id_sali=reservation,
+                                                    nr_grupy=group_nr)
+                s_plan_reserv.save()
+                t_plan_reserv = PlanyZajecNauczycieli(id_planu=plan_teacher_id,
+                                                      plan_studentow=s_plan_reserv,
+                                                      id_przedmiotu=sub_res,
+                                                      typ_zajec=subject_type,
+                                                      id_sali=reservation,
+                                                      nr_grupy=group_nr)
 
-            t_plan_reserv.save()
+                t_plan_reserv.save()
         else:
-            return "Studenci nie mają tego przedmiotu w wybranym semestrze"
+            return  HttpResponse("Studenci nie mają tego przedmiotu w wybranym semestrze")
     except IntegrityError as ie:
         message = ie.message
         return message
