@@ -27,8 +27,8 @@ class StudentSignUpView(CreateView):
 
 
 class StudentEnrolledSemestersListView(TemplateView):
-
     template_name = 'students/universities_list.html'
+
     # context_object_name = 'enrolled_semesters'
 
     @method_decorator(login_required)
@@ -40,60 +40,47 @@ class StudentEnrolledSemestersListView(TemplateView):
         context = super(StudentEnrolledSemestersListView, self).get_context_data(**kwargs)
 
         selected_user = Studenci.objects.all().get(user=self.request.user)
-        print("Selected user")
-        print(selected_user)
         student_semesters = StudentKierunekSemestr.objects.filter(id_studenta=selected_user)
-        print("Students semester")
-        print(student_semesters)
         current_student_semesters = []
         archive_student_semesters = []
         current_plan = {}
         for record in student_semesters:
             try:
-                semestr = Semestry.objects.all().get(pk=record.id_semestru.pk)
+                # semestr = Semestry.objects.all().get(pk=record.id_semestru.pk)
                 if record.is_current():
-                    current_student_semesters.append(semestr)
+                    current_student_semesters.append(record)
                 else:
-                    archive_student_semesters.append(semestr)
+                    archive_student_semesters.append(record)
             except Semestry.DoesNotExist:
                 raise
-        print("curent semesters")
         print(current_student_semesters)
 
         #  this is very simple, it just needs a genius to understand its simplicity.
-        print("current plan")
         for semester in current_student_semesters:
-            if semester.get_kierunek().get_wydzial().get_uczelnia().nazwa_uczelni in current_plan:
-                print(semester.get_kierunek().get_wydzial().nazwa_wydzialu)
-                if semester.get_kierunek().get_wydzial().nazwa_wydzialu in current_plan[
-                    semester.get_kierunek().get_wydzial().get_uczelnia().nazwa_uczelni]:
-                    if semester.get_kierunek().nazwa_kierunku in \
-                            current_plan[semester.get_kierunek().get_wydzial().get_uczelnia().nazwa_uczelni][
-                                semester.get_kierunek().get_wydzial().nazwa_wydzialu]:
+            if semester.id_semestru.get_kierunek().get_wydzial().get_uczelnia().nazwa_uczelni in current_plan:
+                if semester.id_semestru.get_kierunek().get_wydzial().nazwa_wydzialu in current_plan[semester.id_semestru.get_kierunek().get_wydzial().get_uczelnia().nazwa_uczelni]:
+                    if semester.id_semestru.get_kierunek().nazwa_kierunku in \
+                            current_plan[semester.id_semestru.get_kierunek().get_wydzial().get_uczelnia().nazwa_uczelni][
+                                semester.id_semestru.get_kierunek().get_wydzial().nazwa_wydzialu]:
                         raise ValueError(
                             "Student nie może studiować jednocześnie tego samego kierunku na różnych semestrach")
                     else:
-                        temp_dict = {semester.get_kierunek().nazwa_kierunku: semester}
-                        current_plan[semester.get_kierunek().get_wydzial().get_uczelnia().nazwa_uczelni][
-                            semester.get_kierunek().get_wydzial().nazwa_wydzialu].update(temp_dict)
+                        temp_dict = {semester.id_semestru.get_kierunek().nazwa_kierunku: semester}
+                        current_plan[semester.id_semestru.get_kierunek().get_wydzial().get_uczelnia().nazwa_uczelni][
+                            semester.id_semestru.get_kierunek().get_wydzial().nazwa_wydzialu].update(temp_dict)
                 else:
-                    current_plan[semester.get_kierunek().get_wydzial().get_uczelnia().nazwa_uczelni][
-                        semester.get_kierunek().get_wydzial().nazwa_wydzialu] = {}
-                    current_plan[semester.get_kierunek().get_wydzial().get_uczelnia().nazwa_uczelni][
-                        semester.get_kierunek().get_wydzial().nazwa_wydzialu][
-                        semester.get_kierunek().nazwa_kierunku] = semester
+                    current_plan[semester.id_semestru.get_kierunek().get_wydzial().get_uczelnia().nazwa_uczelni][
+                        semester.id_semestru.get_kierunek().get_wydzial().nazwa_wydzialu] = {}
+                    current_plan[semester.id_semestru.get_kierunek().get_wydzial().get_uczelnia().nazwa_uczelni][
+                        semester.id_semestru.get_kierunek().get_wydzial().nazwa_wydzialu][
+                        semester.id_semestru.get_kierunek().nazwa_kierunku] = semester
             else:
-                current_plan[semester.get_kierunek().get_wydzial().get_uczelnia().nazwa_uczelni] = {}
-                current_plan[semester.get_kierunek().get_wydzial().get_uczelnia().nazwa_uczelni][
-                    semester.get_kierunek().get_wydzial().nazwa_wydzialu] = {}
-                current_plan[semester.get_kierunek().get_wydzial().get_uczelnia().nazwa_uczelni][
-                    semester.get_kierunek().get_wydzial().nazwa_wydzialu][
-                    semester.get_kierunek().nazwa_kierunku] = semester
-            print(current_plan)
-
-        print("final current plan")
-        print(current_plan)
-
+                current_plan[semester.id_semestru.get_kierunek().get_wydzial().get_uczelnia().nazwa_uczelni] = {}
+                current_plan[semester.id_semestru.get_kierunek().get_wydzial().get_uczelnia().nazwa_uczelni][
+                    semester.id_semestru.get_kierunek().get_wydzial().nazwa_wydzialu] = {}
+                current_plan[semester.id_semestru.get_kierunek().get_wydzial().get_uczelnia().nazwa_uczelni][
+                    semester.id_semestru.get_kierunek().get_wydzial().nazwa_wydzialu][
+                    semester.id_semestru.get_kierunek().nazwa_kierunku] = semester
         context['current_plan'] = current_plan
         return context
 
@@ -103,6 +90,8 @@ class StudentTimeScheduleView(TemplateView):
     time = ""
     day_of_week = ""
     semester = ""
+    selected_student = ""
+
     @method_decorator(login_required)
     def dispatch(self, *args, **kwargs):
         self.time = kwargs.get('time', datetime.now)
@@ -116,16 +105,16 @@ class StudentTimeScheduleView(TemplateView):
         dt = datetime.strptime(self.time, "%d-%m-%Y")
         start = dt - timedelta(days=dt.weekday())
         end = start + timedelta(days=6)
-        week_dmy = [datetime.strftime(start + timedelta(days=x), "%d-%m-%Y") for x in range(0, (end - start).days+1)]
+        week_dmy = [datetime.strftime(start + timedelta(days=x), "%d-%m-%Y") for x in range(0, (end - start).days + 1)]
         next_week = dt + timedelta(days=7)
         next_week = datetime.strftime(next_week, "%d-%m-%Y")
         last_week = dt - timedelta(days=7)
         last_week = datetime.strftime(last_week, "%d-%m-%Y")
 
-        semester = Semestry.objects.all().get(id_semestru=self.semester)
-        plan = PlanyStudentow.objects.all().get(id_semestru=semester)
-        all_plans = PlanyZajecStudentow.objects.all().filter(id_planu=plan, id_sali__data_rozpoczecia__gte=start, id_sali__data_zakonczenia__lte=end)
-        print(all_plans)
+        semester = StudentKierunekSemestr.objects.all().get(pk=self.semester)
+        plan = PlanyStudentow.objects.all().get(id_semestru=semester.id_semestru, nr_albumu=semester.id_studenta)
+        all_plans = PlanyZajecStudentow.objects.all().filter(id_planu=plan, id_sali__data_rozpoczecia__gte=start,
+                                                             id_sali__data_zakonczenia__lte=end)
         context['time'] = dt
         context['week_start'] = start
         context['week_end'] = end
@@ -154,11 +143,11 @@ class StudentsListView(ListView):
         if self.request.user.is_authenticated:
             if self.request.user.is_student:
                 student = Studenci.objects.all().get(user=self.request.user)
-                semestry_studenta = StudentKierunekSemestr.objects.all().filter(id_studenta=student).values('id_semestru')
+                semestry_studenta = StudentKierunekSemestr.objects.all().filter(id_studenta=student).values(
+                    'id_semestru')
                 semestry = Semestry.objects.all().filter(id_semestru__in=semestry_studenta)
-                studenci = StudentKierunekSemestr.objects.all().filter(Q(id_semestru__in=semestry) & ~Q(id_studenta=student))
-
-                print(studenci)
+                studenci = StudentKierunekSemestr.objects.all().filter(
+                    Q(id_semestru__in=semestry) & ~Q(id_studenta=student))
                 return studenci
         else:
             return None

@@ -195,8 +195,11 @@
     let td_array = document.querySelectorAll("#timetable > tbody > tr > td")
     for(let i=0; i<td_array.length; i++)
     {
+        while (td_array[i].firstChild)
+        {
+            td_array[i].removeChild(td_array[i].firstChild);
+        }
 
-        {#console.log(i)#}
         if(i%7===index%7)
         {
             td_array[i].style.background="rgba(102, 153, 255,0.1)"
@@ -204,7 +207,6 @@
     }
 
     let body_th_array = document.querySelectorAll("#timetable > tbody > tr > th")
-    {#console.log(body_th_array.item(0).children[0].innerHTML)#}
 
     {% for plan in all_plans %}
     for(let i=0; i<body_th_array.length; i++)

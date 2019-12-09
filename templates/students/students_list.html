@@ -6,7 +6,7 @@
     <select id="students_list" onchange="update()" class="browser-default custom-select col-sm-4">
     <option selected >Choose the student to see his/her plan</option>
         {% for student in studentkieruneksemestr_list%}
-            <option value="{{ student.id_semestru.id_semestru }}">{{ student.id_studenta }} {{ student.id_semestru.id_kierunku.nazwa_kierunku }} Semestr {{ student.id_semestru.nr_semestru }}</option>
+            <option value="{{ student.pk }}">{{ student.id_studenta }} {{ student.id_semestru.id_kierunku.nazwa_kierunku }} Semestr {{ student.id_semestru.nr_semestru }}</option>
         {% endfor %}
     </select>
     <a id="student_plan_button" class="btn btn-primary" href="#">Show plan</a>
@@ -14,11 +14,11 @@
     <script>
      function update()
      {
-         let student = document.getElementById("students_list")
+         let student = document.getElementById("students_list");
          let students_semester = student.options[student.selectedIndex].value
          {% now "d-m-Y" as today %}
          {% now "w" as today_day_of_week %}
-         let button = document.getElementById("student_plan_button")
+         let button = document.getElementById("student_plan_button");
          if(Number.isInteger(parseInt(students_semester)))
          {
              button.href="{% url 'students:show_timetable' semester="students_semester" time=today week_day=today_day_of_week %}".replace(/students_semester/,students_semester)

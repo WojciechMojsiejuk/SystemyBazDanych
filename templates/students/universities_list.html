@@ -33,7 +33,7 @@
                             <ul class="list-group list-group-flush">
                                 {% now "d-m-Y" as today %}
                                 {% now "w" as today_day_of_week %}
-                                <a href="{% url 'students:show_timetable' semester=current_kierunek_content.id_semestru time=today week_day=today_day_of_week%}" class="list-group-item list-group-item-action"> Semestr {{ current_kierunek_content.nr_semestru }}</a>
+                                <a href="{% url 'students:show_timetable' semester=current_kierunek_content.pk time=today week_day=today_day_of_week%}" class="list-group-item list-group-item-action"> Semestr {{ current_kierunek_content.id_semestru.nr_semestru }}</a>
                             </ul>
                             </li>
                         {% endfor %}

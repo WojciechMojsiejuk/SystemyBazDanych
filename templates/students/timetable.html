@@ -194,7 +194,7 @@
     let td_array = document.querySelectorAll("#timetable > tbody > tr > td")
     for(let i=0; i<td_array.length; i++)
     {
-
+        td_array[i].innerHTML = null;
         {#console.log(i)#}
         if(i%7===index%7)
         {

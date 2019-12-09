@@ -166,6 +166,9 @@ class Przedmioty(models.Model):
     class Meta:
         verbose_name_plural = "Przedmioty"
 
+    def __str__(self):
+        return str(self.nazwa_przedmiotu)
+
 
 class PrzedmiotyNauczycieli(models.Model):
     id_przedmiotu = models.ForeignKey(Przedmioty, on_delete=models.CASCADE)
